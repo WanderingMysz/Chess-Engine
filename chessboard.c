@@ -3,15 +3,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-// ASCII 'a' = 97
-#define IDX_CHAR(col, row) (col-97 + (row-1)*8)
-#define IDX_NUM(col, row) ((col-1) + (row-1)*8)
-
 #define COL_BITS(col) (((col-1) & 0b00000111) << 3)
 #define ROW_BITS(row) (row & 0b00000111)
-#define POS_BYTE(col_bits, row_bits, vis) (col_bits | row_bits | vis)
 
-const int BOARD_SIZE = 64;
+#define BOARD_SIZE 64
 
 // One-Hot encoding for piece types and colors
 typedef enum {
@@ -39,25 +34,51 @@ typedef struct {
 } Square;
 
 typedef struct {
-    Square squares[64];
+    Square squares[BOARD_SIZE];
 } Chessboard;
+
+// ASCII 'a' = 97
+static int idx_from_char(char col, int row) {return col-97 + (row-1)*8;}
+static int idx_from_int(int col, int row) {return (col-1) + (row-1)*8;}
+static inline uint8_t encode_position(uint8_t col_bits, uint8_t row_bits) {
+    return col_bits | row_bits;
+}
 
 void set_square(Square *sq, uint8_t position, uint8_t piece) {
     sq->position = position;
     sq->piece = piece;
 }
 
-void set_pawns(Chessboard *board, char row) {
+static void set_piece_color(Square *sq, uint8_t color) {
+
+}
+
+static void _set_pawns(Chessboard *board, int row) {
     for (int col = 1; col <= 8; col++) {
-        uint8_t pos_col  = COL_BITS(col);
+        uint8_t pos_col = COL_BITS(col);
         uint8_t pos_row = ROW_BITS(row);
-        uint8_t visibility = (row == 2) ? 0b10000000 : 0b01000000;
-        uint8_t position = POS_BYTE(pos_col, pos_row, visibility);
+        uint8_t pos = encode_position(pos_col, pos_row);
 
         uint8_t piece_type = PAWN;
-        piece_type |= (row == 2) ? WHITE : BLACK;
-        printf("Setting pawn at col %d, row %d (IDX %d)\n", col, row, IDX_NUM(col, row));
-        set_square(&board->squares[IDX_NUM(col, row)], position, piece_type);
+        // printf("Setting pawn at col %d, row %d (IDX %d)\n", 
+        //     col, row, idx_from_int(col, row));
+        set_square(&board->squares[idx_from_int(col, row)], pos, piece_type);
+    }
+}
+
+static void set_pawns(Chessboard *board) {
+    _set_pawns(board, 2);
+    _set_pawns(board, 7);
+}
+
+void set_colors(Chessboard *board) {
+    for (int row = 1; row <= 8; row++) {
+        if (2 < row && row < 7) continue;
+
+        uint8_t color = (row <=2) ? WHITE : BLACK;
+        for (int col = 1; col <= 8; col++) {
+            // PLACEHOLDER
+        }
     }
 }
 
@@ -71,31 +92,36 @@ Chessboard initialize_chessboard() {
     Chessboard board = {0};
 
     // Initialize the chessboard with default values
-    set_pawns(&board, 2); // White pawns
-    set_pawns(&board, 7); // Black pawns
+    set_pawns(&board);
 
     return board;
 }
 
 void visualize_board_state(Chessboard *board, char* output) {
-    int offset = 0; // Offset to account for newlines
-
-    for (int i = 0; i < BOARD_SIZE + 8; i++) {
+    for (int i = 0; i < BOARD_SIZE*2; i++) {
         // Insert newline after every row
-        if (i % 9 == 8) {
+        if (i % 16 == 15) {
             output[i] = '\n';
-            offset++;
             continue;
         }
-        output[i] = (board->squares[i - offset].piece & PAWN) ? 'P' : 
-            (i % 2) ? '#' : ' '; // checkerboard pattern
+        // Populates pieces
+        if (i % 2) {
+            int sq_idx = i / 2;
+            if (board->squares[sq_idx].piece & PAWN) output[i] = 'P';
+
+            // Produces checkerboard # = # =
+            else output[i] = ((sq_idx % 8 + sq_idx / 8) % 2) ? '#' : '=';
+
+        } else {
+            output[i] = ' ';
+        }
     }
-    output[BOARD_SIZE + 8] = '\0';
+    output[BOARD_SIZE * 2] = '\0';
 }
 
 int main(void) {
     Chessboard board = initialize_chessboard();
-    char board_state[BOARD_SIZE + 9];
+    char board_state[BOARD_SIZE * 2]; // x2 so spaces can be added
     visualize_board_state(&board, &board_state[0]);
     printf("%s", board_state);
     return 0;
