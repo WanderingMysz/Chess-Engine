@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <locale.h>
+#include <string.h>
 
 #define COL_BITS(col) (((col-1) & 0b00000111) << 3)
 #define ROW_BITS(row) ((row-1) & 0b00000111)
@@ -10,6 +12,8 @@
 #define MOVEMENT_MASK (1 << 6)
 
 #define BOARD_SIZE 64
+
+#define UNICODE_BYTES 3
 
 // One-Hot encoding for piece types and colors
 typedef enum {
@@ -21,6 +25,20 @@ typedef enum {
     QUEEN       = (1 << 1),
     KING        = 1,
 } PieceType;
+
+const char* unicode_pieces[2][6] = {
+    {"♚", "♛", "♜", "♝", "♞", "♟"}, // Black
+    {"♔", "♕", "♖", "♗", "♘", "♙"}  // White
+};
+
+// Converts piece one-hot to unicode character
+const char* get_unicode(PieceType piece, bool flip_color) {
+    int type_idx = ffs(piece) - 1;
+    int color_idx = piece & COLOR_MASK ? 0 : 1;
+
+    if (flip_color) color_idx = !color_idx;
+    return unicode_pieces[color_idx][type_idx];
+}
 
 typedef enum {
     WHITE       = 0,
@@ -87,6 +105,45 @@ static void set_pawns(Chessboard *board) {
     _set_pawns(board, 7);
 }
 
+static void _set_pieces(Chessboard *board, int row) {
+    for (int col = 1; col <= 8; col++) {
+        uint8_t pos_col = COL_BITS(col);
+        uint8_t pos_row = ROW_BITS(row);
+        uint8_t pos = encode_position(pos_col, pos_row);
+        
+        uint8_t piece_type;
+        switch (col) {
+            case 1:
+            case 8:
+                piece_type = ROOK;
+                break;
+            case 2:
+            case 7:
+                piece_type = KNIGHT;
+                break;
+            case 3:
+            case 6:
+                piece_type = BISHOP;
+                break;
+            case 4:
+                piece_type = KING;
+                break;
+            case 5:
+                piece_type = QUEEN;
+                break;
+            default:
+                piece_type = NONE;
+                break;
+        }
+        set_square(&board->squares[idx_from_int(col, row)], pos, piece_type);
+    }
+}
+
+static void set_pieces(Chessboard *board) {
+    _set_pieces(board, 1);
+    _set_pieces(board, 8);
+}
+
 void set_colors(Chessboard *board) {
     for (int row = 1; row <= 8; row++) {
         uint8_t color = (row <= 4) ? WHITE : BLACK;
@@ -113,6 +170,7 @@ Chessboard initialize_chessboard() {
 
     // Initialize the chessboard with default values
     set_pawns(&board);
+    set_pieces(&board);
     set_colors(&board);
 
     return board;
@@ -121,39 +179,34 @@ static inline bool isWhite(uint8_t piece) {
     return !(piece & COLOR_MASK);
 }
 
-void visualize_board_state(Chessboard *board, char* output) {
-    for (int i = 0; i < BOARD_SIZE*2; i++) {
-        // Insert newline after every row
-        if (i % 16 == 15) {
-            output[i] = '\n';
-            continue;
-        }
+void visualize_board_state(Chessboard *board, char* output, bool flip_color) {
+    output[0] = '\0'; // zeroes output string
 
-        char output_char;
-        // Populates pieces
-        if (i % 2) {
-            int sq_idx = i / 2;
-            if (board->squares[sq_idx].piece & PAWN) {
-                output_char = isWhite(board->squares[sq_idx].piece)
-                    ? 'P' : 'p';
+    for (int row = 8; row >= 1; row--) {
+        for (int col = 1; col <= 8; col++) {
+            int sq_idx = idx_from_int(col, row);
+            int8_t piece = board->squares[sq_idx].piece;
+            int8_t piece_type = piece & ~(COLOR_MASK | MOVEMENT_MASK);
+
+            if (piece_type) {
+                strcat(output, get_unicode(piece, flip_color));
+            } else {
+                // checkerboard pattern
+                bool is_light_sq = (row + col) % 2;
+                strcat(output, is_light_sq ? "=" : "#");
             }
 
-            // Produces checkerboard # = # =
-            else output_char = ((sq_idx % 8 + sq_idx / 8) % 2) 
-                    ? '#' : '=';
-
-        } else {
-            output_char = ' ';
+            strcat(output, " ");
         }
-        output[i] = output_char;
+        strcat(output, "\n");
     }
-    output[BOARD_SIZE * 2] = '\0';
 }
 
 int main(void) {
+    setlocale(LC_ALL, ""); // sets default encoding method, presumably UTF-8
     Chessboard board = initialize_chessboard();
-    char board_state[BOARD_SIZE * 2]; // x2 so spaces can be added
-    visualize_board_state(&board, &board_state[0]);
+    char board_state[BOARD_SIZE * (UNICODE_BYTES + 2)]; //unicode bytes + buffer
+    visualize_board_state(&board, &board_state[0], false);
     printf("%s", board_state);
     return 0;
 }
