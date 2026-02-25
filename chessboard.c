@@ -193,7 +193,7 @@ void visualize_board_state(Chessboard *board, char* output, bool flip_color) {
             } else {
                 // checkerboard pattern
                 bool is_light_sq = (row + col) % 2;
-                strcat(output, is_light_sq ? "=" : "#");
+                strcat(output, is_light_sq ? "□" : "▪");
             }
 
             strcat(output, " ");
