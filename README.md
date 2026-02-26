@@ -27,3 +27,17 @@ defined in the Design Plan below.
 3. Develop the chess engine in PyTorch.
 
 4. Design a GUI for playing with the chess engine. Language TBD.
+
+# Step 3: Chess Engine - BonnieBot
+The basic premise of the chess engine will be to recreate AlphaZero with 
+insights from GPT training by having BonnieBot learn the rules of the game 
+itself from Reinforcement Learning with AI Feedback. In essence, I will divide
+model training into two stages: supervised and reinforcement. In the supervised
+stage, BonnieBot will learn the rules of chess by being corrected by two
+coaches: the chess library itself to ensure move validity and stockfish to
+coach against outright blunders. Once BonnieBot has learned the rules of the
+game, it can then progress to reinforcement learning by self play as with the
+original AlphaZero model.
+
+In the future, I could then have BonnieBot train future versions of itself, as
+with GPT, to see if improvements can be made as a result.
