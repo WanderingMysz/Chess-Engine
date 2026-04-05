@@ -3,6 +3,7 @@
 BEGIN {
     block_field;
     s_break;
+    enumerate;
 }
 {
     for (i = 1; i <= NF; i++) {
@@ -27,7 +28,7 @@ BEGIN {
 
                 # If it matches a move number, e.g. "1.a4"
                 if ($i ~ /^[0-9]+(\.)[^.][a-zA-z0-9]*/) {
-                    # sub(/^[0-9]+(\.)+/, "", $i); 
+                    if (!enumerate) sub(/^[0-9]+(\.)+/, "", $i); 
                     printf "%s", $i;
                 }
                 else {
