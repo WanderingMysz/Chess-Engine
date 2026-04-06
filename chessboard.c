@@ -193,7 +193,7 @@ void visualize_board_state(Chessboard *board, char* output, bool flip_color) {
             } else {
                 // checkerboard pattern
                 bool is_light_sq = (row + col) % 2;
-                strcat(output, is_light_sq ? "□" : "▪");
+                strcat(output, is_light_sq ? " " : "▪");
             }
 
             strcat(output, " ");
@@ -205,7 +205,7 @@ void visualize_board_state(Chessboard *board, char* output, bool flip_color) {
 int main(void) {
     setlocale(LC_ALL, ""); // sets default encoding method, presumably UTF-8
     Chessboard board = initialize_chessboard();
-    char board_state[BOARD_SIZE * (UNICODE_BYTES + 2)]; //unicode bytes + buffer
+    char board_state[BOARD_SIZE * (UNICODE_BYTES + 2)];// unicode bytes + buffer
     visualize_board_state(&board, &board_state[0], false);
     printf("%s", board_state);
     return 0;
