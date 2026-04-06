@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <locale.h>
 #include <string.h>
+#include <ctype.h>
+#include <regex.h>
+#include <strings.h>
 
 #define COL_BITS(col) (((col-1) & 0b00000111) << 3)
 #define ROW_BITS(row) ((row-1) & 0b00000111)
@@ -202,11 +205,47 @@ void visualize_board_state(Chessboard *board, char* output, bool flip_color) {
     }
 }
 
+// Returns if a move string represents a valid move
+bool valid_move(char* move) {
+    const char* pattern = "^(O-O(-O)?|[NBRQK]?[a-h]?x?[a-h][1-8])[+#]?$";
+
+    regex_t re;
+    if (regcomp(&re, pattern, REG_EXTENDED | REG_ICASE)){
+        printf("Failed to compile regex\n");
+        return false;
+    }
+
+    int status = regexec(&re, move, 0, NULL, 0);
+    regfree(&re);
+
+    return status == 0;
+}
+
 int main(void) {
     setlocale(LC_ALL, ""); // sets default encoding method, presumably UTF-8
     Chessboard board = initialize_chessboard();
     char board_state[BOARD_SIZE * (UNICODE_BYTES + 2)];// unicode bytes + buffer
     visualize_board_state(&board, &board_state[0], false);
     printf("%s", board_state);
-    return 0;
+
+    // Game loop
+    bool game_running = true;
+    while (game_running) {
+        printf("Enter move:\n> ");
+        char move[16];
+        fgets(move, sizeof(move), stdin);
+        move[strcspn(move, "\n")] = '\0'; // Remove newline character
+
+        if (strcasecmp(move, "quit") == 0) {
+            game_running = 0;
+            break;
+        }
+
+        bool is_valid = valid_move(move);
+        if (is_valid) {
+            printf("%s is a valid move.\n", move);
+        } else {
+            printf("%s is an invalid move.\n", move);
+        }
+    }
 }
