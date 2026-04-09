@@ -20,23 +20,23 @@ static inline bool isPiece(uint8_t piece) {
 
 //SECTION - Set methods
 static inline bool setWhite(uint8_t* piece) {
-    return (*piece & !(COLOR_MASK));
+    *piece = (*piece & !(COLOR_MASK));
 }
 
 static inline bool setBlack(uint8_t* piece) {
-    return (*piece | MOVEMENT_MASK); 
+    *piece = (*piece | MOVEMENT_MASK); 
 }
 
 static inline bool setMoved(uint8_t* piece) {
-    return (*piece | MOVEMENT_MASK);
+    *piece = (*piece | MOVEMENT_MASK);
 }
 
 static inline bool setUnmoved(uint8_t* piece) {
-    return (*piece & !(MOVEMENT_MASK));
+    *piece = (*piece & !(MOVEMENT_MASK));
 }
 
 static inline bool setPiece(uint8_t* piece, uint8_t piece_type) {
-    return (*piece & (((PIECE_MASK) & piece_type) | !(PIECE_MASK)));
+    *piece = (*piece & (((PIECE_MASK) & piece_type) | !(PIECE_MASK)));
 }
 //!SECTION
 
