@@ -7,8 +7,11 @@
 /* Creates Chessboard */
 Chessboard initialize_chessboard();
 
+/* Creates empty Chessboard */
+Chessboard initialize_empty_chessboard();
+
 /* Updates Square information */
-void set_square(Square *sq, uint8_t position, uint8_t piece);
+void set_square(Chessboard *board, int idx, uint8_t piece);
 
 /* Removes pieces from every square of the board */
 void clear_board(Chessboard *board);
