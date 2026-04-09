@@ -1,17 +1,28 @@
 CC 		= gcc
-TARGET 	= chess
-CFLAGS 	= -Wall -Wextra -std=c11
+CFLAGS 	= -Wall -Wextra -std=c11 -I. -Itest
 
+TARGET 	= chess
 SRCS 	= game.c manipulate_board.c move_validation.c render.c
 OBJS 	= $(SRCS:.c=.o)
+
+TARGET_TEST = unit_testing
+SRCS_TEST = test/unity.c test/test_move_validation.c \
+			manipulate_board.c move_validation.c
+OBJS_TEST = $(SRCS_TEST:.c=.o)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) 
 
+test: $(TARGET_TEST)
+	./$(TARGET_TEST)
+
+$(TARGET_TEST): $(OBJS_TEST)
+	$(CC) $(CFLAGS) -o $(TARGET_TEST) $(OBJS_TEST)
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) $(OBJS)
+	rm -f $(TARGET) $(OBJS) $(TARGET_TEST) $(OBJS_TEST)
