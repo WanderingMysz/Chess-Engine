@@ -27,7 +27,7 @@ bool can_castle(Chessboard *board, bool white, bool kingside) {
         return false;
     }
 
-    int rook_col = kingside ? 1 : 8;
+    int rook_col = kingside ? 8 : 1;
     int rook_idx = idx_from_int(rook_col, row);
     uint8_t rook_piece = board->squares[rook_idx];
 
@@ -37,7 +37,10 @@ bool can_castle(Chessboard *board, bool white, bool kingside) {
     }
 
     // If there are intervening pieces, return false
-    for (int col = rook_col; col != king_col; col = (kingside)? ++col : --col) {
+    for (int col = (kingside) ? --rook_col : ++rook_col; 
+        col != king_col; 
+        (kingside)? --col : ++col
+    ) {
         int intervening_idx = idx_from_int(col, row);
         uint8_t intervening_piece = board->squares[intervening_idx];
 

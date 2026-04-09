@@ -16,13 +16,13 @@ int bl_king_idx;
 void setUp(void) {
     // Clean setup
     board = initialize_empty_chessboard();
-    wh_k_rook_idx = idx_from_int(1,1);
-    wh_q_rook_idx = idx_from_int(8,1);
-    wh_king_idx   = idx_from_int(4,1);
+    wh_k_rook_idx = idx_from_int(8,1);
+    wh_q_rook_idx = idx_from_int(1,1);
+    wh_king_idx   = idx_from_int(5,1);
 
-    bl_k_rook_idx = idx_from_int(1,8);
-    bl_q_rook_idx = idx_from_int(8,8);
-    bl_king_idx   = idx_from_int(4,8);
+    bl_k_rook_idx = idx_from_int(8,8);
+    bl_q_rook_idx = idx_from_int(1,8);
+    bl_king_idx   = idx_from_int(5,8);
 }
 
 void tearDown(void) {
