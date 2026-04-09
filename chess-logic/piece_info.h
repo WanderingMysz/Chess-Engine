@@ -36,7 +36,7 @@ static inline void setUnmoved(uint8_t* piece) {
 }
 
 static inline void setPiece(uint8_t* piece, uint8_t piece_type) {
-    *piece = (*piece & (((PIECE_MASK) & piece_type) | ~(PIECE_MASK)));
+    *piece = ((*piece & ~(PIECE_MASK)) | piece_type);
 }
 //!SECTION
 
