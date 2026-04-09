@@ -8,7 +8,7 @@
 
 #define COLOR_MASK      (1 << 7)
 #define MOVEMENT_MASK   (1 << 6)
-#define PIECE_MASK      !(COLOR_MASK | MOVEMENT_MASK)
+#define PIECE_MASK      ~(COLOR_MASK | MOVEMENT_MASK)
 
 #define BOARD_SIZE    64
 #define UNICODE_BYTES 3
