@@ -22,7 +22,7 @@ bool can_castle(Chessboard *board, bool white, bool kingside) {
     uint8_t king_piece = board->squares[king_idx];
 
     // If the piece is not a king or has moved, return false
-    if (!cmp_piece_type(king_piece, KING) | hasMoved(king_piece)) {
+    if (!cmp_piece_type(king_piece, KING) || hasMoved(king_piece)) {
         return false;
     }
 
@@ -31,7 +31,7 @@ bool can_castle(Chessboard *board, bool white, bool kingside) {
     uint8_t rook_piece = board->squares[rook_idx];
 
     // If the piece is not a rook or has moved, return false
-    if (!cmp_piece_type(rook_piece, ROOK) | hasMoved(rook_piece)) {
+    if (!cmp_piece_type(rook_piece, ROOK) || hasMoved(rook_piece)) {
         return false;
     }
 
