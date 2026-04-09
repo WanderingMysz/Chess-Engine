@@ -28,10 +28,10 @@ int main(void) {
             break;
         }
 
-        if (is_valid_move(move)) {
-            printf("%s is a valid move.\n", move);
+        if (is_SAN(move)) {
+            printf("%s is a validly written move.\n", move);
         } else {
-            printf("%s is an invalid move.\n", move);
+            printf("%s is an invalidly written move.\n", move);
         }
     }
 }
