@@ -12,7 +12,7 @@ static bool cmp_piece_type(uint8_t piece, PieceType comp) {
         if (piece) return false;
         return true;
     }
-    return !(piece & comp);
+    return piece & comp;
 }
 
 bool can_castle(Chessboard *board, bool white, bool kingside) {
