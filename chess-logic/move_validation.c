@@ -6,8 +6,7 @@
 // Returns if a piece matches the given type
 static bool cmp_piece_type(uint8_t piece, PieceType comp) {
     if (comp == NONE) {
-        uint8_t piece_mask = !(COLOR_MASK & MOVEMENT_MASK);
-        piece &= piece_mask;
+        piece &= PIECE_MASK;
 
         if (piece) return false;
         return true;
