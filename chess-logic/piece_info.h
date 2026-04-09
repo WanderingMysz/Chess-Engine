@@ -34,6 +34,10 @@ static inline bool setMoved(uint8_t* piece) {
 static inline bool setUnmoved(uint8_t* piece) {
     return (*piece & !(MOVEMENT_MASK));
 }
+
+static inline bool setPiece(uint8_t* piece, uint8_t piece_type) {
+    return (*piece & (((PIECE_MASK) & piece_type) | !(PIECE_MASK)));
+}
 //!SECTION
 
 // Returns the Index (0-63) of a given board coordinate, e.g. (a,1)

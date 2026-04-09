@@ -6,8 +6,9 @@
 #define COL_BITS(col) (((col-1) & 0b00000111) << 3)
 #define ROW_BITS(row) ((row-1) & 0b00000111)
 
-#define COLOR_MASK    (1 << 7)
-#define MOVEMENT_MASK (1 << 6)
+#define COLOR_MASK      (1 << 7)
+#define MOVEMENT_MASK   (1 << 6)
+#define PIECE_MASK      !(COLOR_MASK | MOVEMENT_MASK)
 
 #define BOARD_SIZE    64
 #define UNICODE_BYTES 3
@@ -33,17 +34,18 @@ typedef enum {
     MOVED   = MOVEMENT_MASK
 } PieceMoved;
 
-typedef struct {
-    // Two highest bits denote square visibility
-    // Remaining six bits denote the position on the board
-    uint8_t position;
-    // Two highest bits denote color and whether the piece has moved
-    // Remaining six bits denote the piece type
-    uint8_t piece;
-} Square;
+// typedef struct {
+//     // Two highest bits denote square visibility
+//     // Remaining six bits denote the position on the board
+//     uint8_t position;
+//     // Two highest bits denote color and whether the piece has moved
+//     // Remaining six bits denote the piece type
+//     uint8_t piece;
+// } Square;
 
+// An array of 64 piece values
 typedef struct {
-    Square squares[BOARD_SIZE];
+    uint8_t squares[BOARD_SIZE];
 } Chessboard;
 
 extern const char* unicode_pieces[2][6];
