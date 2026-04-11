@@ -14,6 +14,16 @@ static bool cmp_piece_type(uint8_t piece, PieceType comp) {
     return piece & comp;
 }
 
+bool piece_exists(Chessboard* board, int idx, uint8_t piece) {
+    uint8_t piece_there = board->squares[idx];
+
+    // Movement_mask doesn't matter for id
+    piece |= MOVEMENT_MASK;
+    piece_there |= MOVEMENT_MASK;
+
+    return piece == piece_there;
+}
+
 bool can_castle(Chessboard *board, bool white, bool kingside) {
     int king_col = 5;
     int row = white ? 1 : 8;
@@ -38,7 +48,7 @@ bool can_castle(Chessboard *board, bool white, bool kingside) {
     // If there are intervening pieces, return false
     for (int col = (kingside) ? --rook_col : ++rook_col; 
         col != king_col; 
-        (kingside)? --col : ++col
+        (kingside) ? --col : ++col
     ) {
         int intervening_idx = idx_from_int(col, row);
         uint8_t intervening_piece = board->squares[intervening_idx];
