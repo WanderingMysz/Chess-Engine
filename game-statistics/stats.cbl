@@ -1,0 +1,36 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. YOUR-PROGRAM-NAME.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT INPUT-FILE  ASSIGN TO "input.dat"
+               ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT OUTPUT-FILE ASSIGN TO "output.dat"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD INPUT-FILE.
+       01 INPUT-RECORD.
+          05 FILLER PIC X(80).
+
+       WORKING-STORAGE SECTION.
+       01 WS-EOF PIC X VALUE 'N'.
+
+       PROCEDURE DIVISION.
+       MAIN-PARAGRAPH.
+           OPEN INPUT  INPUT-FILE
+           OPEN OUTPUT OUTPUT-FILE
+           PERFORM UNTIL WS-EOF = 'Y'
+               READ INPUT-FILE
+                   AT END MOVE 'Y' TO WS-EOF
+                   NOT AT END PERFORM PROCESS-RECORD
+               END-READ
+           END-PERFORM
+           CLOSE INPUT-FILE
+           CLOSE OUTPUT-FILE
+           STOP RUN.
+
+       PROCESS-RECORD.
+           CONTINUE.
