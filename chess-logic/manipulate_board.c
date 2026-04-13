@@ -1,5 +1,11 @@
 #include "manipulate_board.h"
+#include "move_validation.h"
+#include "record.h"
 #include <stdio.h>
+#include <regex.h>
+#include <string.h>
+#include <errno.h>
+#include <stdbool.h>
 
 void set_square(Chessboard* board, int idx, uint8_t piece) {
     board->squares[idx] = piece;
