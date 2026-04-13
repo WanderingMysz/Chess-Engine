@@ -16,7 +16,7 @@ void clear_record(Move_Record* move_record) {
 }
 
 void print_record(Move_Record* move_record) {
-    printf("%4.4d%c %c %d->%d %d%c%d%d", 
+    printf("%4.4d%c %c %2.2d->%2.2d %d%c%d%d", 
             move_record->turn_number,
             move_record->color,
             move_record->piece_type,
@@ -29,7 +29,7 @@ void print_record(Move_Record* move_record) {
 }
 
 void fprint_record(FILE* fp, Move_Record* move_record) {
-    fprintf(fp, "%4.4d%c %c %d->%d %d%c%d%d", 
+    fprintf(fp, "%4.4d%c %c %2.2d->%2.2d %d%c%d%d", 
                 move_record->turn_number,
                 move_record->color,
                 move_record->piece_type,
