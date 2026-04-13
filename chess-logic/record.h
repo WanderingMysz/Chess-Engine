@@ -3,15 +3,17 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdbool.h>
 
 typedef struct {
     size_t turn_number; // Turn Number // TODO: Decide if needed
-    bool color; // Current Player
-    uint8_t piece_type; // Piece Moving
+    char color; // Current Player
+    char piece_type; // Piece Moving
     int src_idx; // Source Square
     int dest_idx; // Destination Square
     bool capture; // Capture?
-    uint8_t promotion; // Pawn Promotion?
+    char promotion; // Pawn Promotion?
     bool check; // Check?
     bool checkmate; // Checkmate?
 } Move_Record;
