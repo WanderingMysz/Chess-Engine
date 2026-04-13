@@ -7,6 +7,12 @@
 #include <errno.h>
 #include <stdbool.h>
 
+static bool wh_turn = true;
+
+void update_turn() {
+    wh_turn = !wh_turn;
+}
+
 void set_square(Chessboard* board, int idx, uint8_t piece) {
     board->squares[idx] = piece;
 }
