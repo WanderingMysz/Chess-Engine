@@ -20,4 +20,8 @@ typedef struct {
 
 void clear_record(Move_Record* move_record);
 
+void print_record(Move_Record* move_record);
+
+void fprint_record(FILE* fp, Move_Record* move_record);
+
 #endif /* RECORD_H */
