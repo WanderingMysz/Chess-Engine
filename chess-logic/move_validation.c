@@ -27,8 +27,24 @@ bool piece_exists(Chessboard* board, int idx, uint8_t piece) {
     return piece == piece_there;
 }
 
+static bool check_square(Chessboard *board, uint8_t piece_type, bool white, 
+                        int src_idx) {
+    uint8_t piece_at_idx = board->squares[src_idx];
+
+    // None doesn't compare about color
+    if (piece_type == NONE) {
+        return isNone(piece_at_idx);
+    }
+
+    // First piece found with right type / color is used
+    if (cmp_piece_type(piece_at_idx, piece_type) 
+        && isWhite(piece_at_idx) == white) {
+        return true;
+    }
+    return false;
+}
+
 /* -1 Not Found, -2 More than one found */
-/*FIXME Refactor to use check_square method as in _locate_bishop() */
 int _locate_knight(Chessboard* board, bool white, int dest_idx, 
                     int col, int row) {
     int offsets[8][2] = {
@@ -62,8 +78,7 @@ int _locate_knight(Chessboard* board, bool white, int dest_idx,
         uint8_t piece_at_idx = board->squares[src_idx];
 
         // First piece found with right type / color is used
-        if (cmp_piece_type(piece_at_idx, KNIGHT) 
-            && isWhite(piece_at_idx) == white) {
+        if (check_square(board, KNIGHT, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
             else return -2;
         }
@@ -72,52 +87,72 @@ int _locate_knight(Chessboard* board, bool white, int dest_idx,
     return ret_idx;
 }
 
-/*FIXME Does not break because of intervening pieces. It only checks for rooks
-in the proper col, row. Ideally, should radiate out from dest_idx until piece 
-in the way */
-/*FIXME Refactor to use check_square method as in _locate_bishop() */
 int _locate_rook(Chessboard* board, bool white, int dest_idx, 
-                    int col, int row) {
+                    int col, int row, bool queen) {
+
+    uint8_t piece_type = (queen) ? QUEEN : ROOK;
 
     int dest_col = col_from_idx(dest_idx);
     int dest_row = row_from_idx(dest_idx);
     int ret_idx = -1;
 
-    // Check left and right
-    for (int src_col = 1; src_col <= 8; src_col++) {
-        // Skip destination square
-        if (src_col == dest_col) continue; 
+    // Check up
+    for (int src_row = dest_row + 1; src_row <= 8; src_row++) {
+        if (src_row != row) continue;
 
-        //TODO Improve to not have check within loop
-        if (col != 0 && src_col != col) continue;
+        int src_idx = idx_from_int(src_row, col);
 
-        int src_idx = idx_from_int(src_col, row);
-        uint8_t piece_at_idx = board->squares[src_idx];
-
-        // First piece found with right type / color is used
-        if (cmp_piece_type(piece_at_idx, ROOK) 
-            && isWhite(piece_at_idx) == white) {
+        if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
             else return -2;
         }
+        if (!check_square(board, NONE, white, src_idx)) {
+            break;
+        }
     }
 
-        // Check left and right
-    for (int src_row = 1; src_row <= 8; src_row++) {
-        // Skip destination square
-        if (src_row == dest_row) continue; 
-        
-        //TODO Improve to not have check within loop
-        if (row != 0 && src_row != row) continue;
+    // Check down
+    for (int src_row = dest_row - 1; src_row <= 8; src_row--) {
+        if (src_row != row) continue;
 
         int src_idx = idx_from_int(src_row, col);
-        uint8_t piece_at_idx = board->squares[src_idx];
 
-        // First piece found with right type / color is used
-        if (cmp_piece_type(piece_at_idx, ROOK) 
-            && isWhite(piece_at_idx) == white) {
+        if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
             else return -2;
+        }
+        if (!check_square(board, NONE, white, src_idx)) {
+            break;
+        }
+    }
+
+    // Check right
+    for (int src_col = dest_col + 1; src_col <= 8; src_col++) {
+        if (src_col != col) continue;
+
+        int src_idx = idx_from_int(row, src_col);
+
+        if (check_square(board, piece_type, white, src_idx))  {
+            if (ret_idx == -1) ret_idx = src_idx;
+            else return -2;
+        }
+        if (!check_square(board, NONE, white, src_idx)) {
+            break;
+        }
+    }
+
+    // Check left
+    for (int src_col = dest_col - 1; src_col <= 8; src_col--) {
+        if (src_col != col) continue;
+
+        int src_idx = idx_from_int(row, src_col);
+
+        if (check_square(board, piece_type, white, src_idx))  {
+            if (ret_idx == -1) ret_idx = src_idx;
+            else return -2;
+        }
+        if (!check_square(board, NONE, white, src_idx)) {
+            break;
         }
     }
 
@@ -125,7 +160,9 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
 }
 
 int _locate_bishop(Chessboard* board, bool white, int dest_idx, 
-                    int col, int row) {
+                    int col, int row, bool queen) {
+
+    uint8_t piece_type = (queen) ? QUEEN : ROOK;
 
     int dest_col = col_from_idx(dest_idx);
     int dest_row = row_from_idx(dest_idx);
@@ -134,121 +171,107 @@ int _locate_bishop(Chessboard* board, bool white, int dest_idx,
     bool break_loop = false;
     
     // up_right
-    for (int src_col = dest_col; src_col <= 8; src_col++) {
-        if (break_loop) {
-            break_loop = false;
+    int src_row = dest_row + 1;
+    for (int src_col = dest_col + 1; src_col <= 8 && src_row <= 8; src_col++) {
+        if (col != 0 && src_col != col) continue;
+        if (row != 0 && src_row != row) continue;
+
+        int src_idx = idx_from_int(src_row, src_col);
+
+        if (check_square(board, piece_type, white, src_idx))  {
+            if (ret_idx == -1) ret_idx = src_idx;
+            else return -2;
+        }
+
+        if (!check_square(board, NONE, white, src_idx)) {
             break;
         }
-        for (int src_row = dest_row; src_row <= 8; src_row++) {
-            if (col != 0 && src_col != col) continue;
-            if (row != 0 && src_row != row) continue;
 
-            int src_idx = idx_from_int(src_row, src_col);
-
-            if (check_square(board, BISHOP, white, src_idx))  {
-                if (ret_idx == -1) ret_idx = src_idx;
-                else return -2;
-            }
-            if (!check_square(board, NONE, white, src_idx)) {
-                break_loop = true;
-                break;
-            }
-        }
+        src_row++;
     }
 
     // down_right
-    for (int src_col = dest_col; src_col <= 8; src_col++) {
-        if (break_loop) {
-            break_loop = false;
+    int src_row = dest_row - 1;
+    for (int src_col = dest_col + 1; src_col <= 8 && 1 <= src_row; src_col++) {
+        if (col != 0 && src_col != col) continue;
+        if (row != 0 && src_row != row) continue;
+
+        int src_idx = idx_from_int(src_row, src_col);
+
+        if (check_square(board, piece_type, white, src_idx))  {
+            if (ret_idx == -1) ret_idx = src_idx;
+            else return -2;
+        }
+
+        if (!check_square(board, NONE, white, src_idx)) {
             break;
         }
 
-        for (int src_row = dest_row; 1 <= src_row; src_row--) {
-            if (col != 0 && src_col != col) continue;
-            if (row != 0 && src_row != row) continue;
-
-            int src_idx = idx_from_int(src_row, src_col);
-
-            if (check_square(board, BISHOP, white, src_idx))  {
-                if (ret_idx == -1) ret_idx = src_idx;
-                else return -2;
-            }
-            if (!check_square(board, NONE, white, src_idx)) {
-                break_loop = true;
-                break;
-            }
-        }
+        src_row--;
     }
 
     // down_left
-    for (int src_col = dest_col; 1 <= src_col; src_col--) {
-        if (break_loop) {
-            break_loop = false;
+    int src_row = dest_row - 1;
+    for (int src_col = dest_col - 1; 1 <= src_col && 1 <= src_row; src_col--) {
+        if (col != 0 && src_col != col) continue;
+        if (row != 0 && src_row != row) continue;
+
+        int src_idx = idx_from_int(src_row, src_col);
+
+        if (check_square(board, piece_type, white, src_idx))  {
+            if (ret_idx == -1) ret_idx = src_idx;
+            else return -2;
+        }
+        if (!check_square(board, NONE, white, src_idx)) {
             break;
         }
-        for (int src_row = dest_row; 1 <= src_row; src_row--) {
-            if (col != 0 && src_col != col) continue;
-            if (row != 0 && src_row != row) continue;
 
-            int src_idx = idx_from_int(src_row, src_col);
-
-            if (check_square(board, BISHOP, white, src_idx))  {
-                if (ret_idx == -1) ret_idx = src_idx;
-                else return -2;
-            }
-            if (!check_square(board, NONE, white, src_idx)) {
-                break_loop = true;
-                break;
-            }
-        }
+        src_row--;
     }
+    
 
     // up_left
-    for (int src_col = dest_col; src_col <= 8; src_col++) {
-        if (break_loop) {
-            break_loop = false;
+    int src_row = dest_row + 1;
+    for (int src_col = dest_col - 1; 1 <= src_col && src_row <= 8; src_col--) {
+        if (col != 0 && src_col != col) continue;
+        if (row != 0 && src_row != row) continue;
+
+        int src_idx = idx_from_int(src_row, src_col);
+
+        if (check_square(board, piece_type, white, src_idx))  {
+            if (ret_idx == -1) ret_idx = src_idx;
+            else return -2;
+        }
+        if (!check_square(board, NONE, white, src_idx)) {
             break;
         }
-        for (int src_row = dest_row; src_row <= 8; src_row++) {
-            if (col != 0 && src_col != col) continue;
-            if (row != 0 && src_row != row) continue;
 
-            int src_idx = idx_from_int(src_row, src_col);
-
-            if (check_square(board, BISHOP, white, src_idx))  {
-                if (ret_idx == -1) ret_idx = src_idx;
-                else return -2;
-            }
-            if (!check_square(board, NONE, white, src_idx)) {
-                break_loop = true;
-                break;
-            }
-        }
+        src_row++;
     }
+
 
     return ret_idx;
 }
 
-static bool check_square(Chessboard *board, uint8_t piece_type, bool white, 
-                        int src_idx) {
-    uint8_t piece_at_idx = board->squares[src_idx];
-
-    // None doesn't compare about color
-    if (piece_type == NONE) {
-        return isNone(piece_at_idx);
-    }
-
-    // First piece found with right type / color is used
-    if (cmp_piece_type(piece_at_idx, piece_type) 
-        && isWhite(piece_at_idx) == white) {
-        return true;
-    }
-    return false;
-}
-
 int _locate_queen(Chessboard* board, bool white, int dest_idx, 
-                    int col, int row);
+                    int col, int row) {
 
+    int ret_idx_r = _locate_rook(board, white, dest_idx, col, row, true);
+    if (ret_idx_r == -2) return -2;
+
+    int ret_idx_b = _locate_bishop(board, white, dest_idx, col, row, true);
+    if (ret_idx_b == -2) return -2;
+
+    if ((ret_idx_r >= 0 && ret_idx_b >= 0)
+        || ret_idx_r == -2 
+        || ret_idx_b == -2) 
+        return -2;
+
+    if (ret_idx_r == -1) {
+        return ret_idx_b;
+    }
+    return ret_idx_r;
+}
 
 int _locate_pawn(Chessboard* board, bool white, int dest_idx, 
                     int col, int row);
@@ -263,10 +286,10 @@ int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, int col, int ro
             ret_idx = _locate_knight(board, white, dest_idx, col, row);
             break;
         case BISHOP:
-            ret_idx = _locate_bishop(board, white, dest_idx, col, row);
+            ret_idx = _locate_bishop(board, white, dest_idx, col, row, false);
             break;
         case ROOK:
-            ret_idx = _locate_rook(board, white, dest_idx, col, row);
+            ret_idx = _locate_rook(board, white, dest_idx, col, row, false);
             break;
         case QUEEN:
             ret_idx = _locate_queen(board, white, dest_idx, col, row);
