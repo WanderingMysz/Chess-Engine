@@ -5,11 +5,6 @@ TARGET 	= chess
 SRCS 	= game.c manipulate_board.c move_validation.c render.c
 OBJS 	= $(SRCS:.c=.o)
 
-TARGET_TEST = unit_testing
-SRCS_TEST = test/unity.c test/test_move_validation.c \
-			manipulate_board.c move_validation.c
-OBJS_TEST = $(SRCS_TEST:.c=.o)
-
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
