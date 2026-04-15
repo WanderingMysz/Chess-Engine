@@ -67,8 +67,8 @@ int _locate_knight(Chessboard* board, bool white, int dest_idx,
         int src_row = offsets[i][1] + dest_row;
 
         // Ignore potential sources outside boundaries
-        if (!(1 <= src_col <= 8)) continue;
-        if (!(1 <= src_row <= 8)) continue;
+        if (!(1 <= src_col && src_col <= 8)) continue;
+        if (!(1 <= src_row && src_row <= 8)) continue;
 
         // Ignore potential sources that don't line up with given information
         if (col != 0 && src_col != col) continue;
@@ -98,9 +98,9 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
 
     // Check up
     for (int src_row = dest_row + 1; src_row <= 8; src_row++) {
-        if (src_row != row) continue;
+        if (row != 0 && src_row != row) continue;
 
-        int src_idx = idx_from_int(src_row, col);
+        int src_idx = idx_from_int(col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -112,10 +112,10 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
     }
 
     // Check down
-    for (int src_row = dest_row - 1; src_row <= 8; src_row--) {
-        if (src_row != row) continue;
+    for (int src_row = dest_row - 1; 1 <= src_row; src_row--) {
+        if (row != 0 && src_row != row) continue;
 
-        int src_idx = idx_from_int(src_row, col);
+        int src_idx = idx_from_int(col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -128,9 +128,9 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
 
     // Check right
     for (int src_col = dest_col + 1; src_col <= 8; src_col++) {
-        if (src_col != col) continue;
+        if (col != 0 && src_col != col) continue;
 
-        int src_idx = idx_from_int(row, src_col);
+        int src_idx = idx_from_int(src_col, row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -142,10 +142,10 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
     }
 
     // Check left
-    for (int src_col = dest_col - 1; src_col <= 8; src_col--) {
-        if (src_col != col) continue;
+    for (int src_col = dest_col - 1; 1 <= src_col; src_col--) {
+        if (col != 0 && src_col != col) continue;
 
-        int src_idx = idx_from_int(row, src_col);
+        int src_idx = idx_from_int(src_col, row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -176,7 +176,7 @@ int _locate_bishop(Chessboard* board, bool white, int dest_idx,
         if (col != 0 && src_col != col) continue;
         if (row != 0 && src_row != row) continue;
 
-        int src_idx = idx_from_int(src_row, src_col);
+        int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -191,12 +191,12 @@ int _locate_bishop(Chessboard* board, bool white, int dest_idx,
     }
 
     // down_right
-    int src_row = dest_row - 1;
+    src_row = dest_row - 1;
     for (int src_col = dest_col + 1; src_col <= 8 && 1 <= src_row; src_col++) {
         if (col != 0 && src_col != col) continue;
         if (row != 0 && src_row != row) continue;
 
-        int src_idx = idx_from_int(src_row, src_col);
+        int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -211,12 +211,12 @@ int _locate_bishop(Chessboard* board, bool white, int dest_idx,
     }
 
     // down_left
-    int src_row = dest_row - 1;
+    src_row = dest_row - 1;
     for (int src_col = dest_col - 1; 1 <= src_col && 1 <= src_row; src_col--) {
         if (col != 0 && src_col != col) continue;
         if (row != 0 && src_row != row) continue;
 
-        int src_idx = idx_from_int(src_row, src_col);
+        int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -231,12 +231,12 @@ int _locate_bishop(Chessboard* board, bool white, int dest_idx,
     
 
     // up_left
-    int src_row = dest_row + 1;
+    src_row = dest_row + 1;
     for (int src_col = dest_col - 1; 1 <= src_col && src_row <= 8; src_col--) {
         if (col != 0 && src_col != col) continue;
         if (row != 0 && src_row != row) continue;
 
-        int src_idx = idx_from_int(src_row, src_col);
+        int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -256,9 +256,11 @@ int _locate_bishop(Chessboard* board, bool white, int dest_idx,
 int _locate_queen(Chessboard* board, bool white, int dest_idx, 
                     int col, int row) {
 
+    // Check rook-like squares
     int ret_idx_r = _locate_rook(board, white, dest_idx, col, row, true);
     if (ret_idx_r == -2) return -2;
 
+    // Check bishop-like squares
     int ret_idx_b = _locate_bishop(board, white, dest_idx, col, row, true);
     if (ret_idx_b == -2) return -2;
 
