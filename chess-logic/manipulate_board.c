@@ -52,10 +52,10 @@ static void _set_pieces(Chessboard *board, int row) {
                 piece_type = BISHOP;
                 break;
             case 4:
-                piece_type = KING;
+                piece_type = QUEEN;
                 break;
             case 5:
-                piece_type = QUEEN;
+                piece_type = KING;
                 break;
             default:
                 piece_type = NONE;
