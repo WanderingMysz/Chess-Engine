@@ -3,10 +3,11 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "types.h"
 
 typedef struct {
     size_t turn_number; // Turn Number // TODO: Decide if needed
-    bool color; // Current Player
+    int color; // Current Player
     uint8_t piece_type; // Piece Moving
     int src_idx; // Source Square
     int dest_idx; // Destination Square

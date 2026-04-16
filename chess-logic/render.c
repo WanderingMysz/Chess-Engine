@@ -14,7 +14,7 @@ void visualize_board_state(Chessboard *board, char* output, bool flip_color) {
         for (int col = 1; col <= 8; col++) {
             int sq_idx = idx_from_int(col, row);
             int8_t piece = board->squares[sq_idx];
-            int8_t piece_type = piece & ~(COLOR_MASK | MOVEMENT_MASK);
+            int8_t piece_type = piecetype(piece);
 
             if (piece_type) {
                 strcat(output, get_unicode(piece, flip_color));
