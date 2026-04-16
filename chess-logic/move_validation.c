@@ -7,7 +7,7 @@ static int WH_KING_IDX = -1;
 static int BL_KING_IDX = -1;
 
 // Returns if a piece matches the given type
-static bool cmp_piece_type(uint8_t piece, PieceType comp) {
+bool cmp_piece_type(uint8_t piece, PieceType comp) {
     if (comp == NONE) {
         piece &= PIECE_MASK;
 
