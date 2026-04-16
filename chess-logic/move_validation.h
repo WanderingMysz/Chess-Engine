@@ -24,4 +24,6 @@ bool piece_exists(Chessboard* board, int idx, uint8_t piece);
 int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, 
                 int col, int row);
 
+bool cmp_piece_type(uint8_t piece, PieceType comp);
+
 #endif /* MOVE_VALIDATION_H */
