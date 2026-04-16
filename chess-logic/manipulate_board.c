@@ -1,12 +1,15 @@
 #include "manipulate_board.h"
 #include "move_validation.h"
 #include "record.h"
+#include "types.h"
 #include <stdio.h>
 #include <regex.h>
 #include <string.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
+// TODO: Move regex compilation outside function scope so it only occurs once
 static bool wh_turn = true;
 
 void update_turn() {

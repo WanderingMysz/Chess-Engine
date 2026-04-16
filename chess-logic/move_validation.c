@@ -274,8 +274,8 @@ int _locate_queen(Chessboard* board, bool white, int dest_idx,
     return ret_idx_r;
 }
 
-int _locate_pawn(Chessboard* board, bool white, int dest_idx, 
-                    int col, int row);
+// Unlike pieces, pawns will ALWAYS have a col label and NEVER a row label
+// int _locate_pawn(Chessboard* board, bool white, int dest_idx, int col);
 
 int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, int col, int row) {
     bool white = isWhite(piece);

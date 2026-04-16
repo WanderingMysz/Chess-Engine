@@ -3,9 +3,14 @@
 #include <stdio.h>
 #include <locale.h>
 #include <string.h>
+#include <ctype.h>
 #include "render.h"
 #include "piece_info.h"
 #include "manipulate_board.h"
+#include "move_validation.h"
+#include "record.h"
+
+static bool EN_PASSANT_FLAG = false;
 #include "move_validation.h"
 
 int main(void) {
