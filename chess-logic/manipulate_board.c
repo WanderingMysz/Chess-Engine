@@ -81,6 +81,126 @@ static void set_colors(Chessboard *board) {
     }
 }
 
+static uint8_t _get_piece_type(char letter) {
+    switch (letter) {
+        case 'N':
+            return KNIGHT;
+        case 'B':
+            return BISHOP;
+        case 'R':
+            return ROOK;
+        case 'Q':
+            return QUEEN;
+        case 'K':
+            return KING;
+        default:
+            return PAWN;
+    }
+}
+
+int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
+    int src_idx, dest_idx;
+    uint8_t piece;
+
+    size_t left_idx = 0;
+    size_t right_idx = strlen(move_str) - 1;
+
+    // last two values excluding promotions and checks is always destination
+
+    // Checks for Promotion
+    char* ptr = strchr("NBRQ", move_str[right_idx]);
+    if (ptr) {
+        move_record->promotion = _get_piece_type(*ptr);
+        right_idx -= 2;
+    }
+
+    // Checks for Check(mate)
+    switch (move_str[right_idx]) {
+        // Check / Checkmate
+        case '#':
+            move_record->checkmate = true;
+        case '+':
+            move_record->check = true;
+            right_idx -= 2;
+            break;
+        // Standard move
+        default:
+            right_idx--;
+            break;
+    }
+    dest_idx = idx_from_char(move_str[right_idx],move_str[right_idx+1]);
+    move_record->dest_idx = dest_idx;
+    right_idx--;
+
+    if (move_str[right_idx] == 'X') {
+        right_idx--;
+        move_record->capture = true;
+    }
+
+    // pieces default to white
+    piece = _get_piece_type(move_str[0]);
+
+    if (!wh_turn) {
+        setBlack(&piece);
+        move_record->color = BLACK;
+    } else {
+        move_record->color = WHITE;
+    }
+
+    move_record->piece_type = piece;
+
+    /* NOTE: Piece's color could be set after the comparison, but this is
+       structured per the natural logic */
+       
+    // Extracts information from bracketed area: N [g6] xe5 
+    char src_info[3] = {'\0', '\0', '\0'};
+    if (!cmp_piece_type(piece, PAWN)) left_idx++;
+    for (int i = 0; left_idx <= right_idx; i++) {
+        if (2 <= i) {
+            printf("Too many values for source idx. Aborting.\n");
+            return 1; // TODO: Make dict to enumerate error codes
+        }
+        src_info[i] = move_str[left_idx];
+        left_idx++;
+    }
+
+    // If the entire source information is provided, validate then return
+    switch (strlen(src_info)) {
+        case 2:
+            src_idx = idx_from_char(src_info[0], src_info[1]);
+            break;
+        case 1:
+            ;
+            char* ptr;
+
+            ptr = strchr("ABCDEFGH", src_info[0]);
+            if (ptr) {
+                int col = *ptr - 'A' + 1;
+                src_idx = locate_piece(board, piece, dest_idx, col, 0);
+                break;
+            }
+            
+            ptr = strchr("12345678", src_info[0]);
+            if (ptr) {
+                int row = *ptr - '0';
+                src_idx = locate_piece(board, piece, dest_idx, 0, row);
+                break;
+            }
+
+            return 1;
+
+        case 0:
+            src_idx = locate_piece(board, piece, dest_idx, 0, 0);
+            break;
+        
+        default:
+            return 1;
+    }
+
+    move_record->src_idx = src_idx;
+    return (piece_exists(board, src_idx, piece)) ? 0 : 1; // TODO: Desc. error code
+}
+
 Chessboard initialize_chessboard() {
     Chessboard board = {0};
 
