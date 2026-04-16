@@ -75,7 +75,6 @@ int _locate_knight(Chessboard* board, bool white, int dest_idx,
         if (row != 0 && src_row != row) continue;
 
         int src_idx = idx_from_int(src_col, src_row);
-        uint8_t piece_at_idx = board->squares[src_idx];
 
         // First piece found with right type / color is used
         if (check_square(board, KNIGHT, white, src_idx))  {
@@ -343,7 +342,8 @@ bool can_castle(Chessboard *board, bool white, bool kingside) {
 }
 
 bool is_SAN(char* move) {
-    const char* pattern = "^(O-O(-O)?|[NBRQK]?[a-h]?x?[a-h][1-8])[+#]?$";
+    // TODO Correct such that promotion only works with pawns
+    const char* pattern = "^(O-O(-O)?|[NBRQK]?[A-H]?x?[A-H][1-8])[+#]?(=[NBRQ])?$";
 
     regex_t re;
     if (regcomp(&re, pattern, REG_EXTENDED | REG_ICASE)){
