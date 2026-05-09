@@ -44,7 +44,8 @@ static bool check_square(Chessboard *board, uint8_t piece_type, bool white,
     return false;
 }
 
-/* -1 Not Found, -2 More than one found */
+/* TODO: Refactor to have explicit error codes that are called, not nums */
+/* -1 Not Found, -2 More than one found, -3 Notation error */
 int _locate_knight(Chessboard* board, bool white, int dest_idx, 
                     int col, int row) {
     int offsets[8][2] = {
@@ -95,11 +96,12 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
     int dest_row = row_from_idx(dest_idx);
     int ret_idx = -1;
 
+    int src_col = dest_col;
     // Check up
     for (int src_row = dest_row + 1; src_row <= 8; src_row++) {
         if (row != 0 && src_row != row) continue;
 
-        int src_idx = idx_from_int(col, src_row);
+        int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -114,7 +116,7 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
     for (int src_row = dest_row - 1; 1 <= src_row; src_row--) {
         if (row != 0 && src_row != row) continue;
 
-        int src_idx = idx_from_int(col, src_row);
+        int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -125,11 +127,12 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
         }
     }
 
+    int src_row = dest_row;
     // Check right
     for (int src_col = dest_col + 1; src_col <= 8; src_col++) {
         if (col != 0 && src_col != col) continue;
 
-        int src_idx = idx_from_int(src_col, row);
+        int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -144,7 +147,7 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
     for (int src_col = dest_col - 1; 1 <= src_col; src_col--) {
         if (col != 0 && src_col != col) continue;
 
-        int src_idx = idx_from_int(src_col, row);
+        int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
@@ -161,7 +164,7 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
 int _locate_bishop(Chessboard* board, bool white, int dest_idx, 
                     int col, int row, bool queen) {
 
-    uint8_t piece_type = (queen) ? QUEEN : ROOK;
+    uint8_t piece_type = (queen) ? QUEEN : BISHOP;
 
     int dest_col = col_from_idx(dest_idx);
     int dest_row = row_from_idx(dest_idx);
@@ -306,6 +309,7 @@ int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, int col, int ro
     return ret_idx;
 }
 
+// FIXME cannot castle into danger
 bool can_castle(Chessboard *board, bool white, bool kingside) {
     int king_col = 5;
     int row = white ? 1 : 8;
