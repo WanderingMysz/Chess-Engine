@@ -96,6 +96,28 @@ void test_can_castle_blocked_unmoved(void) {
     TEST_ASSERT_TRUE(can_castle(&board, true, true));
 }
 
+void test_can_castle_attacked(void) {
+    // Set knight to block white's castling
+    int bl_knight_idx = idx_from_int(5,3);
+    uint8_t bl_knight = KNIGHT;
+    setBlack(&bl_knight);
+    set_square(&board, bl_knight_idx, bl_knight);
+
+    // White can't castle, black can
+    TEST_ASSERT_FALSE(can_castle(&board, true, true));
+    TEST_ASSERT_FALSE(can_castle(&board, true, false));
+
+    TEST_ASSERT_TRUE(can_castle(&board, false, true));
+    TEST_ASSERT_TRUE(can_castle(&board, false, false));
+
+    // Remove knight, white should be able to castle now
+    set_square(&board, bl_knight_idx, NONE);
+    TEST_ASSERT_TRUE(can_castle(&board, true, true));
+    TEST_ASSERT_TRUE(can_castle(&board, true, false));
+
+    // TODO: Add test for bishop as long range attack
+}
+
 int main(void) {
     UNITY_BEGIN();
     
