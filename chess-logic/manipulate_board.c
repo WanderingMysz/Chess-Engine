@@ -204,8 +204,13 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
             return 1;
     }
 
+    // TODO: Add descriptive error codes
     move_record->src_idx = src_idx;
-    return (piece_exists(board, src_idx, piece)) ? 0 : 1; // TODO: Desc. error code
+    if (piece_exists(board, src_idx, piece)) {
+        wh_turn = !wh_turn;
+        return 0;
+    }
+    return 1;
 }
 
 Chessboard initialize_chessboard() {
