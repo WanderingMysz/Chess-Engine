@@ -104,6 +104,7 @@ static uint8_t _get_piece_type(char letter) {
 int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
     int src_idx, dest_idx;
     uint8_t piece;
+    bool capture = false;
 
     size_t left_idx = 0;
     size_t right_idx = strlen(move_str) - 1;
@@ -137,6 +138,7 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
 
     if (move_str[right_idx] == 'X') {
         right_idx--;
+        capture = true;
         move_record->capture = true;
     }
 
@@ -179,21 +181,21 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
             ptr = strchr("ABCDEFGH", src_info[0]);
             if (ptr) {
                 int col = *ptr - 'A' + 1;
-                src_idx = locate_piece(board, piece, dest_idx, col, 0);
+                src_idx = locate_piece(board, piece, dest_idx, col, 0, capture);
                 break;
             }
             
             ptr = strchr("12345678", src_info[0]);
             if (ptr) {
                 int row = *ptr - '0';
-                src_idx = locate_piece(board, piece, dest_idx, 0, row);
+                src_idx = locate_piece(board, piece, dest_idx, 0, row, capture);
                 break;
             }
 
             return 1;
 
         case 0:
-            src_idx = locate_piece(board, piece, dest_idx, 0, 0);
+            src_idx = locate_piece(board, piece, dest_idx, 0, 0, capture);
             break;
         
         default:
