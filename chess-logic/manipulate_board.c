@@ -2,6 +2,7 @@
 #include "move_validation.h"
 #include "record.h"
 #include "types.h"
+#include "piece_info.h"
 #include <stdio.h>
 #include <regex.h>
 #include <string.h>
@@ -20,11 +21,11 @@ void set_square(Chessboard* board, int idx, uint8_t piece) {
     board->squares[idx] = piece;
 }
 
-/* Sets the color of a given square's piece */
-static void set_piece_color(uint8_t* piece, uint8_t color) {
-    *piece &= ~(COLOR_MASK);
-    *piece |= color;
-}
+// /* Sets the color of a given square's piece */
+// static void set_piece_color(uint8_t* piece, uint8_t color) {
+//     *piece &= ~(COLOR_MASK);
+//     *piece |= color;
+// }
 
 static void _set_pawns(Chessboard *board, int row) {
     for (int col = 1; col <= 8; col++) {
@@ -79,7 +80,8 @@ static void set_colors(Chessboard *board) {
 
         for (int col = 1; col <= 8; col++) {
             int idx = idx_from_int(col, row);
-            set_piece_color(&(board->squares[idx]), color);
+            (color == WHITE)? setWhite(&(board->squares[idx])) 
+                            : setBlack(&(board->squares[idx]));
         }
     }
 }
