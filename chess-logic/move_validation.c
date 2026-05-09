@@ -277,10 +277,55 @@ int _locate_queen(Chessboard* board, bool white, int dest_idx,
     return ret_idx_r;
 }
 
+int _locate_pawn(Chessboard* board, bool white, int dest_idx, int col, bool capture){
+    int dest_col = col_from_idx(dest_idx);
+    int dest_row = row_from_idx(dest_idx);
+    int src_idx;
+
+    if (!capture) {
+        if (dest_col != col) return -3; // Can't change columns w/out capture
+
+        if (white) {
+            dest_row--;
+            src_idx = idx_from_int(col, dest_row);
+            if (check_square(board, PAWN, white, src_idx)) return src_idx;
+            if (!check_square(board, NONE, white, src_idx)) return -1;
+
+            // Repeat to check for initial two-square movement
+            if (dest_row == 3) {
+                dest_row--;
+                int src_idx = idx_from_int(col, dest_row);
+                if (check_square(board, PAWN, white, src_idx)) return src_idx;
+            }
+        }
+        else {
+            dest_row++;
+            src_idx = idx_from_int(col, dest_row);
+            if (check_square(board, PAWN, white, src_idx)) return src_idx;
+            if (!check_square(board, NONE, white, src_idx)) return -1;
+
+            // Repeat to check for initial two-square movement
+            if (dest_row == 6) {
+                dest_row++;
+                int src_idx = idx_from_int(col, dest_row);
+                if (check_square(board, PAWN, white, src_idx)) return src_idx;
+            }
+        }
+
+        return -1;
+    } 
+
+    // Column always provided for captures
+    if (col < 1 || 8 < col) return -3;
+    src_idx = idx_from_int(col, dest_row--);
+    return check_square(board, PAWN, white, src_idx) ? src_idx : -1;
+}
+
 // Unlike pieces, pawns will ALWAYS have a col label and NEVER a row label
 // int _locate_pawn(Chessboard* board, bool white, int dest_idx, int col);
 
-int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, int col, int row) {
+int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, 
+                 int col, int row, bool capture) {
     bool white = isWhite(piece);
     uint8_t piece_type = piecetype(piece);
 
@@ -302,7 +347,7 @@ int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, int col, int ro
             ret_idx = (white) ? WH_KING_IDX : BL_KING_IDX;
             break;
         default:
-            ret_idx = _locate_pawn(board, white, dest_idx, col, row);
+            ret_idx = _locate_pawn(board, white, dest_idx, col, capture);
             break;
     }
 
