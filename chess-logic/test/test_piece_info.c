@@ -14,11 +14,6 @@ void test_idx_from_char(void) {
     TEST_ASSERT_TRUE(idx_from_char('H','8') == 63);
     TEST_ASSERT_TRUE(idx_from_char('A','1') == 0);
     TEST_ASSERT_TRUE(idx_from_char('H','1') == 7);
-
-    TEST_ASSERT_TRUE(idx_from_int(1, 8) == 56);
-    TEST_ASSERT_TRUE(idx_from_int(8, 8) == 63);
-    TEST_ASSERT_TRUE(idx_from_int(1, 1) == 0);
-    TEST_ASSERT_TRUE(idx_from_int(8, 1) == 7);
 }
 
 void test_idx_from_int(void) {
