@@ -225,3 +225,16 @@ void clear_board(Chessboard *board) {
         set_square(board, i, NONE);
     }
 }
+
+void make_move(Chessboard *board, Move_Record* move) {
+    set_square(board, move->src_idx, NONE);
+    int color = move->color;
+
+    uint8_t piece = move->piece_type;
+    if (color == WHITE) setWhite(&piece);
+    else setBlack(&piece);
+    setMoved(&piece);
+
+    printf("Setting %d to %u\n", move->dest_idx, piece);
+    set_square(board, move->dest_idx, piece);
+}
