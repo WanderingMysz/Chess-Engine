@@ -1,23 +1,30 @@
-CC 		= gcc
-CFLAGS 	= -Wall -Wextra -std=c11 -I. -Itest
+CC 			= gcc
+CFLAGS 		= -Wall -Wextra -std=c11 -I. -Itest
+DBG_FLAG	= -g
 
-TARGET 	= chess
-SRCS 	= game.c manipulate_board.c move_validation.c render.c
-OBJS 	= $(SRCS:.c=.o)
+TARGET 		= chess
+TARGET_DBG 	= chess_debug
+SRCS 		= game.c manipulate_board.c move_validation.c render.c
+OBJS 		= $(SRCS:.c=.o)
+OBJS_DBG	= $(SRCS:.c=.dbg.o)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) 
+	chmod +x $(TARGET)
 
-test: $(TARGET_TEST)
-	./$(TARGET_TEST)
+debug: $(TARGET_DBG)
 
-$(TARGET_TEST): $(OBJS_TEST)
-	$(CC) $(CFLAGS) -o $(TARGET_TEST) $(OBJS_TEST)
+$(TARGET_DBG): $(OBJS_DBG)
+	$(CC) $(CFLAGS) $(DBG_FLAG) -o $(TARGET_DBG) $(OBJS_DBG)
+	chmod +x $(TARGET_DBG)
+
+%.dbg.o: %.c
+	$(CC) $(CFLAGS) $(DBG_FLAG) -c $< -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) $(OBJS) $(TARGET_TEST) $(OBJS_TEST)
+	rm -f $(TARGET) $(OBJS) $(TARGET_DBG) $(OBJS_DBG)
