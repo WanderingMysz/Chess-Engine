@@ -1,5 +1,6 @@
 #include "move_validation.h"
 #include "piece_info.h"
+#include "errors.h"
 #include <regex.h>
 #include <stdio.h>
 
@@ -80,7 +81,7 @@ static int _locate_knight(Chessboard* board, bool white, int dest_idx,
         // First piece found with right type / color is used
         if (check_square(board, KNIGHT, white, src_idx))  {
             if (ret_idx == -1) ret_idx = src_idx;
-            else return -2;
+            else return ERR_MULTIPLE_FOUND;
         }
     }
 
@@ -94,7 +95,7 @@ static int _locate_rook(Chessboard* board, bool white, int dest_idx,
 
     int dest_col = col_from_idx(dest_idx);
     int dest_row = row_from_idx(dest_idx);
-    int ret_idx = -1;
+    int ret_idx = ERR_NONE_FOUND;
 
     int src_col = dest_col;
     // Check up
@@ -104,8 +105,8 @@ static int _locate_rook(Chessboard* board, bool white, int dest_idx,
         int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
-            if (ret_idx == -1) ret_idx = src_idx;
-            else return -2;
+            if (ret_idx == ERR_NONE_FOUND) ret_idx = src_idx;
+            else return ERR_MULTIPLE_FOUND;
         }
         if (!check_square(board, NONE, white, src_idx)) {
             break;
@@ -119,8 +120,8 @@ static int _locate_rook(Chessboard* board, bool white, int dest_idx,
         int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
-            if (ret_idx == -1) ret_idx = src_idx;
-            else return -2;
+            if (ret_idx == ERR_NONE_FOUND) ret_idx = src_idx;
+            else return ERR_MULTIPLE_FOUND;
         }
         if (!check_square(board, NONE, white, src_idx)) {
             break;
@@ -135,8 +136,8 @@ static int _locate_rook(Chessboard* board, bool white, int dest_idx,
         int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
-            if (ret_idx == -1) ret_idx = src_idx;
-            else return -2;
+            if (ret_idx == ERR_NONE_FOUND) ret_idx = src_idx;
+            else return ERR_MULTIPLE_FOUND;
         }
         if (!check_square(board, NONE, white, src_idx)) {
             break;
@@ -150,8 +151,8 @@ static int _locate_rook(Chessboard* board, bool white, int dest_idx,
         int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
-            if (ret_idx == -1) ret_idx = src_idx;
-            else return -2;
+            if (ret_idx == ERR_NONE_FOUND) ret_idx = src_idx;
+            else return ERR_MULTIPLE_FOUND;
         }
         if (!check_square(board, NONE, white, src_idx)) {
             break;
@@ -168,7 +169,7 @@ static int _locate_bishop(Chessboard* board, bool white, int dest_idx,
 
     int dest_col = col_from_idx(dest_idx);
     int dest_row = row_from_idx(dest_idx);
-    int ret_idx = -1;
+    int ret_idx = ERR_NONE_FOUND;
 
     bool break_loop = false;
     
@@ -181,8 +182,8 @@ static int _locate_bishop(Chessboard* board, bool white, int dest_idx,
         int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
-            if (ret_idx == -1) ret_idx = src_idx;
-            else return -2;
+            if (ret_idx == ERR_NONE_FOUND) ret_idx = src_idx;
+            else return ERR_MULTIPLE_FOUND;
         }
 
         if (!check_square(board, NONE, white, src_idx)) {
@@ -201,8 +202,8 @@ static int _locate_bishop(Chessboard* board, bool white, int dest_idx,
         int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
-            if (ret_idx == -1) ret_idx = src_idx;
-            else return -2;
+            if (ret_idx == ERR_NONE_FOUND) ret_idx = src_idx;
+            else return ERR_MULTIPLE_FOUND;
         }
 
         if (!check_square(board, NONE, white, src_idx)) {
@@ -221,8 +222,8 @@ static int _locate_bishop(Chessboard* board, bool white, int dest_idx,
         int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
-            if (ret_idx == -1) ret_idx = src_idx;
-            else return -2;
+            if (ret_idx == ERR_NONE_FOUND) ret_idx = src_idx;
+            else return ERR_MULTIPLE_FOUND;
         }
         if (!check_square(board, NONE, white, src_idx)) {
             break;
@@ -241,8 +242,8 @@ static int _locate_bishop(Chessboard* board, bool white, int dest_idx,
         int src_idx = idx_from_int(src_col, src_row);
 
         if (check_square(board, piece_type, white, src_idx))  {
-            if (ret_idx == -1) ret_idx = src_idx;
-            else return -2;
+            if (ret_idx == ERR_NONE_FOUND) ret_idx = src_idx;
+            else return ERR_MULTIPLE_FOUND;
         }
         if (!check_square(board, NONE, white, src_idx)) {
             break;
@@ -260,18 +261,18 @@ static int _locate_queen(Chessboard* board, bool white, int dest_idx,
 
     // Check rook-like squares
     int ret_idx_r = _locate_rook(board, white, dest_idx, col, row, true);
-    if (ret_idx_r == -2) return -2;
+    if (ret_idx_r == ERR_MULTIPLE_FOUND) return ERR_MULTIPLE_FOUND;
 
     // Check bishop-like squares
     int ret_idx_b = _locate_bishop(board, white, dest_idx, col, row, true);
-    if (ret_idx_b == -2) return -2;
+    if (ret_idx_b == ERR_MULTIPLE_FOUND) return ERR_MULTIPLE_FOUND;
 
     if ((ret_idx_r >= 0 && ret_idx_b >= 0)
-        || ret_idx_r == -2 
-        || ret_idx_b == -2) 
-        return -2;
+        || ret_idx_r == ERR_MULTIPLE_FOUND 
+        || ret_idx_b == ERR_MULTIPLE_FOUND) 
+        return ERR_MULTIPLE_FOUND;
 
-    if (ret_idx_r == -1) {
+    if (ret_idx_r == ERR_NONE_FOUND) {
         return ret_idx_b;
     }
     return ret_idx_r;
@@ -281,20 +282,23 @@ static int _locate_pawn(Chessboard* board, bool white, int dest_idx,
                         int col, bool capture){
     int dest_col = col_from_idx(dest_idx);
     int dest_row = row_from_idx(dest_idx);
-    int src_idx;
+    int src_idx = ERR_NONE_FOUND;
 
     printf("Pawn Destination: (%d, %d)\n", dest_col, dest_row);
 
     if (!capture) {
         printf("Pawn Movement\n");
+        // Should not be notated for standard movement
         if (col == 0) col = dest_col;
-        else return -3; // Should not have been notated for standard movement
+        else return ERR_NOTATION;
 
         if (white) {
             dest_row--;
             src_idx = idx_from_int(col, dest_row);
             if (check_square(board, PAWN, white, src_idx)) return src_idx;
-            if (!check_square(board, NONE, white, src_idx)) return -1;
+            if (!check_square(board, NONE, white, src_idx)) return {
+                return ERR_NONE_FOUND
+            }
 
             // Repeat to check for initial two-square movement
             if (dest_row == 3) {
@@ -307,7 +311,9 @@ static int _locate_pawn(Chessboard* board, bool white, int dest_idx,
             dest_row++;
             src_idx = idx_from_int(col, dest_row);
             if (check_square(board, PAWN, white, src_idx)) return src_idx;
-            if (!check_square(board, NONE, white, src_idx)) return -1;
+            if (!check_square(board, NONE, white, src_idx)) {
+                return ERR_NONE_FOUND;
+            }
 
             // Repeat to check for initial two-square movement
             if (dest_row == 6) {
@@ -317,22 +323,23 @@ static int _locate_pawn(Chessboard* board, bool white, int dest_idx,
             }
         }
 
-        return -1;
+        return ERR_NONE_FOUND;
     } 
     printf("Pawn Capture\n");
 
     // Column always provided for captures
-    if (col < 1 || 8 < col) return -3;
+    if (col < 1 || 8 < col) return ERR_NOTATION;
     src_idx = idx_from_int(col, dest_row--);
-    return check_square(board, PAWN, white, src_idx) ? src_idx : -1;
+    return check_square(board, PAWN, white, src_idx) ? src_idx : ERR_NONE_FOUND;
 }
 
 int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, 
                  int col, int row, bool capture) {
+    printf("Locating piece...\n");
     bool white = isWhite(piece);
     uint8_t piece_type = piecetype(piece);
 
-    int ret_idx = -1;
+    int ret_idx = ERR_NONE_FOUND;
     switch (piece_type) {
         case KNIGHT:
             ret_idx = _locate_knight(board, white, dest_idx, col, row);
@@ -356,7 +363,7 @@ int locate_piece(Chessboard* board, uint8_t piece, int dest_idx,
 
     if (ret_idx >= 64) {
         printf("ERROR: Piece found to be out of bounds at index %d.\n",ret_idx);
-        return -4;
+        return ERR_OTHER;
     }
     return ret_idx;
 }

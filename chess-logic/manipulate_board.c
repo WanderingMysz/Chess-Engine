@@ -3,6 +3,7 @@
 #include "record.h"
 #include "types.h"
 #include "piece_info.h"
+#include "errors.h"
 #include <stdio.h>
 #include <regex.h>
 #include <string.h>
@@ -104,7 +105,7 @@ static uint8_t _get_piece_type(char letter) {
 }
 
 int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
-    int src_idx, dest_idx;
+    int src_idx = -1, dest_idx = -1;
     uint8_t piece;
     bool capture = false;
 
