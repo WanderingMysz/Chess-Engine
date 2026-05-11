@@ -351,6 +351,10 @@ int locate_piece(Chessboard* board, uint8_t piece, int dest_idx,
             break;
     }
 
+    if (ret_idx >= 64) {
+        printf("ERROR: Piece found to be out of bounds at index %d.\n",ret_idx);
+        return -4;
+    }
     return ret_idx;
 }
 
