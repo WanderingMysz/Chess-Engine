@@ -108,8 +108,8 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
     uint8_t piece;
     bool capture = false;
 
-    size_t left_idx = 0;
-    size_t right_idx = strlen(move_str) - 1;
+    int left_idx = 0;
+    int right_idx = strlen(move_str) - 1;
 
     // last two values excluding promotions and checks is always destination
 
@@ -127,22 +127,29 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
             move_record->checkmate = true;
         case '+':
             move_record->check = true;
-            right_idx -= 2;
+            right_idx--;
             break;
         // Standard move
         default:
-            right_idx--;
             break;
     }
-    dest_idx = idx_from_char(move_str[right_idx],move_str[right_idx+1]);
+    dest_idx = idx_from_char(move_str[right_idx-1],move_str[right_idx]);
+
+    // Cannot capture yourself
+    uint8_t dest_piece = board->squares[dest_idx];
+    if (!cmp_piece_type(dest_piece, NONE) && (isWhite(dest_piece) == wh_turn)) {
+        printf("Cannot capture your own piece.\n");
+        return 1;
+    }
+
     move_record->dest_idx = dest_idx;
-    right_idx--;
+    right_idx-= 2;
 
     if (move_str[right_idx] == 'X') {
         right_idx--;
         capture = true;
-        move_record->capture = true;
     }
+    move_record->capture = capture;
 
     // pieces default to white
     piece = _get_piece_type(move_str[0]);
@@ -180,9 +187,9 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
             ;
             char* ptr;
 
-            ptr = strchr("ABCDEFGH", src_info[0]);
+            ptr = strchr("abcdefgh", src_info[0]);
             if (ptr) {
-                int col = *ptr - 'A' + 1;
+                int col = *ptr - 'a' + 1;
                 src_idx = locate_piece(board, piece, dest_idx, col, 0, capture);
                 break;
             }
@@ -204,12 +211,16 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
             return 1;
     }
 
+    // Error codes all negative
+    if (src_idx < 0) return 1;
+
     // TODO: Add descriptive error codes
     move_record->src_idx = src_idx;
     if (piece_exists(board, src_idx, piece)) {
         wh_turn = !wh_turn;
         return 0;
     }
+    printf("Piece %d @ %d does not exist.\n", (int)piece, src_idx);
     return 1;
 }
 
@@ -244,6 +255,6 @@ void make_move(Chessboard *board, Move_Record* move) {
     else setBlack(&piece);
     setMoved(&piece);
 
-    printf("Setting %d to %u\n", move->dest_idx, piece);
+    // printf("Setting %d to %u\n", move->dest_idx, piece);
     set_square(board, move->dest_idx, piece);
 }

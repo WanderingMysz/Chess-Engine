@@ -46,7 +46,7 @@ static inline void setPiece(uint8_t* piece, uint8_t piece_type) {
 
 // SECTION - Index methods
 // Returns the Index (0-63) of a given board coordinate, e.g. (a,1)
-static int idx_from_char(char col, char row) {return col-'A' + (row-'1')*8;}
+static int idx_from_char(char col, char row) {return col-'a' + (row-'1')*8;}
 // Returns the Index (0-63) of a given board coordinate, e.g. (1,1)
 static int idx_from_int(int col, int row) {return (col-1) + (row-1)*8;}
 

@@ -26,16 +26,16 @@ int main(void) {
         printf("%s", board_state);
 
         printf("Enter move:\n> ");
-        char typed_move[16];
-        fgets(typed_move, sizeof(typed_move), stdin);
-        typed_move[strcspn(typed_move, "\n")] = '\0'; // Remove newline character
-
         char move[16];
-        for (int i = 0; i < 16; i++) {
-            move[i] = toupper(typed_move[i]);
-        }
+        fgets(move, sizeof(move), stdin);
+        move[strcspn(move, "\n")] = '\0'; // Remove newline character
 
-        if (streq(move, "QUIT") || streq(move, "EXIT")) {
+        // char move[16];
+        // for (int i = 0; i < 16; i++) {
+        //     move[i] = toupper(typed_move[i]);
+        // }
+
+        if (streq(move, "quit") || streq(move, "exit")) {
             printf("Closing game. Thank you for playing!\n");
             game_running = false;
             break;
@@ -45,10 +45,12 @@ int main(void) {
             Move_Record move_record;
             if (get_move_info(&board, move, &move_record) == 0) {
                 make_move(&board, &move_record);
-                
                 continue;
             }
         }
-        printf("\n%s is an invalid move. Try again\n\n", typed_move);
+        else {
+            printf("Error processing SAN. ");
+        }
+        printf("\n%s is an invalid move. Try again\n\n", move);
     }
 }
