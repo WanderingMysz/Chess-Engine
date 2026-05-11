@@ -412,7 +412,7 @@ bool can_castle(Chessboard *board, bool white, bool kingside) {
 bool is_SAN(char* move) {
     // TODO Correct such that promotion only works with pawns
     const char* pattern = ( "^(O-O(-O)?|0-0(-0)?|" // Castling
-                            "[NBRQK]?[a-h]?x?[a-h][1-8])" // Standard
+                            "[NBRQK]?[a-h]?[1-8]?x?[a-h][1-8])" // Standard
                             "[+#]?(=[NBRQ])?$"); // Checks and Promotions
 
     regex_t re;
