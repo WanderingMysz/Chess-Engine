@@ -3,8 +3,8 @@
 #include <regex.h>
 #include <stdio.h>
 
-static int WH_KING_IDX = -1;
-static int BL_KING_IDX = -1;
+static int WH_KING_IDX = 4;
+static int BL_KING_IDX = 60;
 
 // Returns if a piece matches the given type
 bool cmp_piece_type(uint8_t piece, PieceType comp) {
@@ -45,8 +45,8 @@ static bool check_square(Chessboard *board, uint8_t piece_type, bool white,
 }
 
 /* TODO: Refactor to have explicit error codes that are called, not nums */
-/* -1 Not Found, -2 More than one found, -3 Notation error */
-int _locate_knight(Chessboard* board, bool white, int dest_idx, 
+/* -1 Not Found, -2 More than one found, -3 Notation error, -4 Other */
+static int _locate_knight(Chessboard* board, bool white, int dest_idx, 
                     int col, int row) {
     int offsets[8][2] = {
         {1,2},
@@ -87,7 +87,7 @@ int _locate_knight(Chessboard* board, bool white, int dest_idx,
     return ret_idx;
 }
 
-int _locate_rook(Chessboard* board, bool white, int dest_idx, 
+static int _locate_rook(Chessboard* board, bool white, int dest_idx, 
                     int col, int row, bool queen) {
 
     uint8_t piece_type = (queen) ? QUEEN : ROOK;
@@ -161,7 +161,7 @@ int _locate_rook(Chessboard* board, bool white, int dest_idx,
     return ret_idx;
 }
 
-int _locate_bishop(Chessboard* board, bool white, int dest_idx, 
+static int _locate_bishop(Chessboard* board, bool white, int dest_idx, 
                     int col, int row, bool queen) {
 
     uint8_t piece_type = (queen) ? QUEEN : BISHOP;
@@ -255,7 +255,7 @@ int _locate_bishop(Chessboard* board, bool white, int dest_idx,
     return ret_idx;
 }
 
-int _locate_queen(Chessboard* board, bool white, int dest_idx, 
+static int _locate_queen(Chessboard* board, bool white, int dest_idx, 
                     int col, int row) {
 
     // Check rook-like squares
@@ -277,13 +277,18 @@ int _locate_queen(Chessboard* board, bool white, int dest_idx,
     return ret_idx_r;
 }
 
-int _locate_pawn(Chessboard* board, bool white, int dest_idx, int col, bool capture){
+static int _locate_pawn(Chessboard* board, bool white, int dest_idx, 
+                        int col, bool capture){
     int dest_col = col_from_idx(dest_idx);
     int dest_row = row_from_idx(dest_idx);
     int src_idx;
 
+    printf("Pawn Destination: (%d, %d)\n", dest_col, dest_row);
+
     if (!capture) {
-        if (dest_col != col) return -3; // Can't change columns w/out capture
+        printf("Pawn Movement\n");
+        if (col == 0) col = dest_col;
+        else return -3; // Should not have been notated for standard movement
 
         if (white) {
             dest_row--;
@@ -294,7 +299,7 @@ int _locate_pawn(Chessboard* board, bool white, int dest_idx, int col, bool capt
             // Repeat to check for initial two-square movement
             if (dest_row == 3) {
                 dest_row--;
-                int src_idx = idx_from_int(col, dest_row);
+                src_idx = idx_from_int(col, dest_row);
                 if (check_square(board, PAWN, white, src_idx)) return src_idx;
             }
         }
@@ -307,22 +312,20 @@ int _locate_pawn(Chessboard* board, bool white, int dest_idx, int col, bool capt
             // Repeat to check for initial two-square movement
             if (dest_row == 6) {
                 dest_row++;
-                int src_idx = idx_from_int(col, dest_row);
+                src_idx = idx_from_int(col, dest_row);
                 if (check_square(board, PAWN, white, src_idx)) return src_idx;
             }
         }
 
         return -1;
     } 
+    printf("Pawn Capture\n");
 
     // Column always provided for captures
     if (col < 1 || 8 < col) return -3;
     src_idx = idx_from_int(col, dest_row--);
     return check_square(board, PAWN, white, src_idx) ? src_idx : -1;
 }
-
-// Unlike pieces, pawns will ALWAYS have a col label and NEVER a row label
-// int _locate_pawn(Chessboard* board, bool white, int dest_idx, int col);
 
 int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, 
                  int col, int row, bool capture) {
@@ -396,7 +399,7 @@ bool can_castle(Chessboard *board, bool white, bool kingside) {
 
 bool is_SAN(char* move) {
     // TODO Correct such that promotion only works with pawns
-    const char* pattern = "^(O-O(-O)?|[NBRQK]?[A-H]?x?[A-H][1-8])[+#]?(=[NBRQ])?$";
+    const char* pattern = "^(O-O(-O)?|0-0(-0)?|[NBRQK]?[a-h]?x?[a-h][1-8])[+#]?(=[NBRQ])?$";
 
     regex_t re;
     if (regcomp(&re, pattern, REG_EXTENDED | REG_ICASE)){
