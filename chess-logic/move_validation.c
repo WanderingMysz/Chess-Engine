@@ -296,8 +296,8 @@ static int _locate_pawn(Chessboard* board, bool white, int dest_idx,
             dest_row--;
             src_idx = idx_from_int(col, dest_row);
             if (check_square(board, PAWN, white, src_idx)) return src_idx;
-            if (!check_square(board, NONE, white, src_idx)) return {
-                return ERR_NONE_FOUND
+            if (!check_square(board, NONE, white, src_idx)) {
+                return ERR_NONE_FOUND;
             }
 
             // Repeat to check for initial two-square movement
@@ -329,7 +329,7 @@ static int _locate_pawn(Chessboard* board, bool white, int dest_idx,
 
     // Column always provided for captures
     if (col < 1 || 8 < col) return ERR_NOTATION;
-    src_idx = idx_from_int(col, dest_row--);
+    src_idx = idx_from_int(col, --dest_row);
     return check_square(board, PAWN, white, src_idx) ? src_idx : ERR_NONE_FOUND;
 }
 
@@ -338,6 +338,11 @@ int locate_piece(Chessboard* board, uint8_t piece, int dest_idx,
     printf("Locating piece...\n");
     bool white = isWhite(piece);
     uint8_t piece_type = piecetype(piece);
+
+    if (!capture && !check_square(board, NONE, white, dest_idx)) {
+        printf("Cannot move to occupied square. Can capture if legal.\n");
+        return ERR_NOTATION;
+    }
 
     int ret_idx = ERR_NONE_FOUND;
     switch (piece_type) {
@@ -407,7 +412,7 @@ bool can_castle(Chessboard *board, bool white, bool kingside) {
 bool is_SAN(char* move) {
     // TODO Correct such that promotion only works with pawns
     const char* pattern = ( "^(O-O(-O)?|0-0(-0)?|" // Castling
-                            "[NBRQK]?[a-h]?[xX]?[a-h][1-8])" // Standard
+                            "[NBRQK]?[a-h]?x?[a-h][1-8])" // Standard
                             "[+#]?(=[NBRQ])?$"); // Checks and Promotions
 
     regex_t re;

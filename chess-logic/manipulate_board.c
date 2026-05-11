@@ -146,7 +146,7 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
     move_record->dest_idx = dest_idx;
     right_idx-= 2;
 
-    if (move_str[right_idx] == 'X') {
+    if (move_str[right_idx] == 'x') {
         right_idx--;
         capture = true;
     }
@@ -213,7 +213,10 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
     }
 
     // Error codes all negative
-    if (src_idx < 0) return 1;
+    if (src_idx < 0) {
+        printf("ERROR: %d\n", src_idx);
+        return 1;
+    }
 
     // TODO: Add descriptive error codes
     move_record->src_idx = src_idx;
