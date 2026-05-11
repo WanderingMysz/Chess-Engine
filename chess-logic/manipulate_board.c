@@ -182,7 +182,8 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
     // If the entire source information is provided, validate then return
     switch (strlen(src_info)) {
         case 2:
-            src_idx = idx_from_char(src_info[0], src_info[1]);
+            src_idx = locate_piece(board, piece, dest_idx, 
+                                    src_info[0], src_info[1], capture);
             break;
         case 1:
             ;

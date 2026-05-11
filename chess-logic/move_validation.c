@@ -3,6 +3,7 @@
 #include "errors.h"
 #include <regex.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static int WH_KING_IDX = 4;
 static int BL_KING_IDX = 60;
@@ -333,6 +334,26 @@ static int _locate_pawn(Chessboard* board, bool white, int dest_idx,
     return check_square(board, PAWN, white, src_idx) ? src_idx : ERR_NONE_FOUND;
 }
 
+static int _locate_king(bool white, int dest_idx) {
+    int dest_col = col_from_idx(dest_idx);
+    int dest_row = row_from_idx(dest_idx);
+    int king_col = col_from_idx((white) ? WH_KING_IDX : BL_KING_IDX);
+    int king_row = row_from_idx((white) ? WH_KING_IDX : BL_KING_IDX);
+
+    int ret_idx = ERR_NOTATION;
+
+    if (abs(dest_col - king_col) <= 1 && abs(dest_row - king_row) <= 1) {
+        if (white) {
+            ret_idx = WH_KING_IDX;
+            WH_KING_IDX = dest_idx;
+        } else {
+            ret_idx = BL_KING_IDX;
+            BL_KING_IDX = dest_idx;
+        }
+    }
+    return ret_idx;
+}
+
 int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, 
                  int col, int row, bool capture) {
     printf("Locating piece...\n");
@@ -359,7 +380,7 @@ int locate_piece(Chessboard* board, uint8_t piece, int dest_idx,
             ret_idx = _locate_queen(board, white, dest_idx, col, row);
             break;
         case KING:
-            ret_idx = (white) ? WH_KING_IDX : BL_KING_IDX;
+            ret_idx = _locate_king(white, dest_idx);
             break;
         default:
             ret_idx = _locate_pawn(board, white, dest_idx, col, capture);
