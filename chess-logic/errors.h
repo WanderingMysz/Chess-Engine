@@ -1,5 +1,5 @@
-#ifndef ERRORS.H
-#define ERRORS.H
+#ifndef ERRORS_H
+#define ERRORS_H
 
 typedef enum {
     ERR_NONE_FOUND = -1,
@@ -8,4 +8,4 @@ typedef enum {
     ERR_OTHER = -4
 } ValidationErrorCode;
 
-#endif
+#endif /* ERRORS_H */
