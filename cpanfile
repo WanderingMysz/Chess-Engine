@@ -1,0 +1,1 @@
+requires 'Text::Levenshtein', '>= 0.11';
