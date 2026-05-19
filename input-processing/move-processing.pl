@@ -55,3 +55,15 @@ compare_hashes(\%found_coords, \%found_pieces);
 if ($duplicate_idx) {
     die "Ambiguity exists in one or more words. Please input move again.\n";
 }
+
+my @pieces = ();
+while (my ($piece_idx, $piece_type) = each %found_pieces) {
+    push @pieces, { idx => $piece_idx, 
+                    type => $piece_type, 
+                    role => undef, 
+                    coord => undef };
+}
+
+foreach my $hash_ptr (@pieces) {
+    print "$hash_ptr->{type}\n";
+}
