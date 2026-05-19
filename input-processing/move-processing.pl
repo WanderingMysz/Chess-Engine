@@ -32,11 +32,26 @@ foreach (@input_uc) {
     $idx++;
 }
 
-print("KEYWORDS FOUND\n");
-for(keys %found_keywords) {
-    print("$input[$_] @ $_\n");
+# There should be at most four pieces in a sensible string:
+# Attacker, Defender, Promotion, Checks (King)
+die "Malformed input string. More than 4 pieces present.\n" 
+    if scalar %found_pieces > 4;
+
+# If words are assigned to multiple types, malformed input
+my $duplicate_idx = 0;
+sub compare_hashes {
+    my $hash1_ptr = shift;
+    my $hash2_ptr = shift;
+
+    foreach my $hash1_idx (keys %$hash1_ptr) {
+        foreach my $hash2_idx (keys %$hash2_ptr) {
+            $duplicate_idx++ if $hash1_idx == $hash2_idx;
+        }
+    }
 }
-print("\nPIECES FOUND\n");
-for(keys %found_pieces) {
-    print("$input[$_] @ $_\n");
+compare_hashes(\%found_keywords, \%found_pieces);
+compare_hashes(\%found_keywords, \%found_coords);
+compare_hashes(\%found_coords, \%found_pieces);
+if ($duplicate_idx) {
+    die "Ambiguity exists in one or more words. Please input move again.\n";
 }
