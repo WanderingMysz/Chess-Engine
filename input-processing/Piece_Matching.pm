@@ -37,6 +37,7 @@ sub process_word {
         $closest_idx = $i if $distances[$i] < $distances[$closest_idx];
     }
     return $piece_types[$closest_idx] if $distances[$closest_idx] <= 2;
+    return undef;
 }
 
 1;

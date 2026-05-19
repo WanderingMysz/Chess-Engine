@@ -29,7 +29,7 @@ sub process_word {
     # If the word is not short, only match if it's 2 or fewer typos.
     # Otherwise it is undefined.
     if (length($word) <= 3) {
-        return $keywords[$closest_idx] if $distances[closest_idx] <= 1;
+        return $keywords[$closest_idx] if $distances[$closest_idx] <= 1;
         return undef;
     }
     return $keywords[$closest_idx] if $distances[$closest_idx] <= 2;
