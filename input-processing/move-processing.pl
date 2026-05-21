@@ -7,8 +7,8 @@ use lib $RealBin;
 
 use Word_Matching qw(match_keyword match_piece);
 
-my %move_record = map { uc($_) => 0 }
-                    qw(typefrom typeto from to capture promotion check);
+my %move_record = map { lc($_) => 0 }
+                    qw(type_from type_to from to capture promotion check);
 
 # Takes user move string, removes punctuation except for those necessary for
 # SAN, then segments the move string into its constituent words
@@ -56,12 +56,12 @@ if ($duplicate_idx) {
     die "Ambiguity exists in one or more words. Please input move again.\n";
 }
 
-my @pieces = ();
+my @piece_info = ();
 while (my ($piece_idx, $piece_type) = each %found_pieces) {
-    push @pieces, { idx => $piece_idx, 
-                    type => $piece_type, 
-                    role => undef, 
-                    coord => undef };
+    push @piece_info, { idx => $piece_idx, 
+                        type => $piece_type, 
+                        role => undef, 
+                        coord => undef };
 }
 
 foreach my $hash_ptr (@pieces) {
