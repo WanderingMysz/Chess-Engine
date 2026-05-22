@@ -9,7 +9,8 @@ our @EXPORT_OK = qw(match_keyword match_piece);
 use Text::Levenshtein qw(distance);
 
 my @keywords = qw(ON FROM TO TAKES CAPTURES PROMOTES 
-                  CHECK CHECKS CHECKMATE MATE);
+                  CHECK CHECKMATE MATE
+                  CASTLES KINGSIDE QUEENSIDE);
 
 my %letter_codes = (
     N => 'KNIGHT',
