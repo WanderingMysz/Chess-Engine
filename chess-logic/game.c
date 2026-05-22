@@ -44,13 +44,14 @@ int main(void) {
         if (is_SAN(move)) {
             Move_Record move_record;
             if (get_move_info(&board, move, &move_record) == 0) {
-                make_move(&board, &move_record);
-                continue;
+                if (make_move(&board, &move_record) == 0) continue;
+                printf("King in check.\n");
             }
         }
         else {
             printf("Error processing SAN. ");
         }
+
         printf("\n%s is an invalid move. Try again\n\n", move);
     }
 }
