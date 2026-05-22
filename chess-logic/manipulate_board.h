@@ -17,7 +17,8 @@ void set_square(Chessboard *board, int idx, uint8_t piece);
 /* Removes pieces from every square of the board */
 void clear_board(Chessboard *board);
 
-int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record);
+/* Converts SAN input to move record */
+int get_move_info(Chessboard* board, char* SAN_input, Move_Record* move_record);
 
 /* Attempts to make the given move. Returns 1 if the move is illegal */
 int make_move(Chessboard *board, Move_Record* move);
