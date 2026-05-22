@@ -2,7 +2,8 @@
 
 PROJECT_ROOT := $(shell pwd)
 
-include makefiles/c.mk
+include makefiles/cli.mk
 
 all: CLI
 clean: CLI-clean
+refresh: clean all
