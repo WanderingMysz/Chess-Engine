@@ -4,23 +4,28 @@ use warnings;
 use strict;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(match_keyword match_piece);
+our @EXPORT_OK = qw(match_keyword match_piece 
+                    @mating_terms @queenside_terms @kingside_terms @keywords 
+                    %letter_codes %rev_letter_codes @piece_types);
 
 use Text::Levenshtein qw(distance);
 
-my @keywords = qw(ON FROM TO TAKES CAPTURES PROMOTES 
-                  CHECK CHECKMATE MATE
-                  CASTLES KINGSIDE QUEENSIDE);
+our @mating_terms       = qw(CHECK CHECKMATE MATE);
+our @queenside_terms    = qw(QUEENSIDE LONG);
+our @kingside_terms     = qw(KINGSIDE SHORT);
+our @keywords           = (qw(ON FROM TO TAKES CAPTURES PROMOTES CASTLES),
+                           @mating_terms, @queenside_terms, @kingside_terms);
 
-my %letter_codes = (
+our @piece_types = qw(KNIGHT BISHOP ROOK QUEEN KING PAWN);
+our %letter_codes = (
     N => 'KNIGHT',
     B => 'BISHOP',
     R => 'ROOK',
     Q => 'QUEEN',
     K => 'KING',
-    P => 'PAWN',
+    '' => 'PAWN',
 );
-my @piece_types = qw(KNIGHT BISHOP ROOK QUEEN KING PAWN);
+our %rev_letter_codes = reverse %letter_codes;
 
 sub match_keyword {
     my $word = uc(shift);

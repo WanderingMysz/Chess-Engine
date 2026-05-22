@@ -8,6 +8,8 @@ no warnings 'experimental::smartmatch';
 use Exporter qw(import);
 our @EXPORT_OK = qw(process_keyword);
 
+use Word_Matching qw(@queenside_terms @kingside_terms);
+
 our ($idx, $keywords, $coords, $pieces, $piece_info, $move_record);
 my @TO_EXCEPTIONS = qw(PROMOTES CASTLES);
 
@@ -125,9 +127,15 @@ sub _mate {
 sub _castle {
     my $direction = ($keywords->{$idx+1} eq "TO") ? $keywords->{$idx+2} 
                                                   : $keywords->{$idx+1};
+    $direction = uc ($direction);
+
     if (!defined $direction) { return 1 };
-    if ($direction eq 'QUEENSIDE' or $direction eq 'KINGSIDE') {
-        _update_move_record("castle", $direction);
+    if (grep {$direction eq $_} @queenside_terms) {
+        _update_move_record("castle", "queenside");
+        return 0;
+    } elsif (grep {$direction eq $_} @kingside_terms) {
+        _update_move_record("castle", "kingside");
+        return 0;
     }
     return 1;
 }
