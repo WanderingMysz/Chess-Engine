@@ -105,25 +105,25 @@ static uint8_t _get_piece_type(char letter) {
     }
 }
 
-int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
+int get_move_info(Chessboard* board, char* SAN_input, Move_Record* move_record) {
     int src_idx = -1, dest_idx = -1;
     uint8_t piece;
     bool capture = false;
 
     int left_idx = 0;
-    int right_idx = strlen(move_str) - 1;
+    int right_idx = strlen(SAN_input) - 1;
 
     // last two values excluding promotions and checks is always destination
 
     // Checks for Promotion
-    char* ptr = strchr("NBRQ", move_str[right_idx]);
+    char* ptr = strchr("NBRQ", SAN_input[right_idx]);
     if (ptr) {
         move_record->promotion = _get_piece_type(*ptr);
         right_idx -= 2;
     }
 
     // Checks for Check(mate)
-    switch (move_str[right_idx]) {
+    switch (SAN_input[right_idx]) {
         // Check / Checkmate
         case '#':
             move_record->checkmate = true;
@@ -135,7 +135,7 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
         default:
             break;
     }
-    dest_idx = idx_from_char(move_str[right_idx-1],move_str[right_idx]);
+    dest_idx = idx_from_char(SAN_input[right_idx-1],SAN_input[right_idx]);
 
     // Cannot capture yourself
     uint8_t dest_piece = board->squares[dest_idx];
@@ -147,14 +147,14 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
     move_record->dest_idx = dest_idx;
     right_idx-= 2;
 
-    if (move_str[right_idx] == 'x') {
+    if (SAN_input[right_idx] == 'x') {
         right_idx--;
         capture = true;
     }
     move_record->capture = capture;
 
     // pieces default to white
-    piece = _get_piece_type(move_str[0]);
+    piece = _get_piece_type(SAN_input[0]);
 
     if (!wh_turn) {
         setBlack(&piece);
@@ -176,7 +176,7 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
             printf("Too many values for source idx. Aborting.\n");
             return 1; // TODO: Make dict to enumerate error codes
         }
-        src_info[i] = move_str[left_idx];
+        src_info[i] = SAN_input[left_idx];
         left_idx++;
     }
 
