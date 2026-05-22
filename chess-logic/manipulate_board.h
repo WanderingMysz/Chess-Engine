@@ -19,6 +19,7 @@ void clear_board(Chessboard *board);
 
 int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record);
 
-void make_move(Chessboard *board, Move_Record* move);
+/* Attempts to make the given move. Returns 1 if the move is illegal */
+int make_move(Chessboard *board, Move_Record* move);
 
 #endif /* MANIPULATE_BOARD_H */

@@ -8,6 +8,11 @@
 static int WH_KING_IDX = 4;
 static int BL_KING_IDX = 60;
 
+void set_king(bool white, int idx) {
+    if (white) WH_KING_IDX = idx;
+    else BL_KING_IDX = idx;
+}
+
 // Returns if a piece matches the given type
 bool cmp_piece_type(uint8_t piece, PieceType comp) {
     if (comp == NONE) {
@@ -17,6 +22,10 @@ bool cmp_piece_type(uint8_t piece, PieceType comp) {
         return true;
     }
     return piece & comp;
+}
+
+bool cmp_piece_color(uint8_t piece, bool white) {
+    return (white) ? isWhite(piece) : !isWhite(piece);
 }
 
 bool piece_exists(Chessboard* board, int idx, uint8_t piece) {
@@ -334,24 +343,47 @@ static int _locate_pawn(Chessboard* board, bool white, int dest_idx,
     return check_square(board, PAWN, white, src_idx) ? src_idx : ERR_NONE_FOUND;
 }
 
-static int _locate_king(bool white, int dest_idx) {
-    int dest_col = col_from_idx(dest_idx);
-    int dest_row = row_from_idx(dest_idx);
-    int king_col = col_from_idx((white) ? WH_KING_IDX : BL_KING_IDX);
-    int king_row = row_from_idx((white) ? WH_KING_IDX : BL_KING_IDX);
+// static int _locate_king(bool white, int dest_idx) {
+//     int dest_col = col_from_idx(dest_idx);
+//     int dest_row = row_from_idx(dest_idx);
+//     int king_col = col_from_idx((white) ? WH_KING_IDX : BL_KING_IDX);
+//     int king_row = row_from_idx((white) ? WH_KING_IDX : BL_KING_IDX);
 
-    int ret_idx = ERR_NOTATION;
+//     int ret_idx = ERR_NOTATION;
 
-    if (abs(dest_col - king_col) <= 1 && abs(dest_row - king_row) <= 1) {
-        if (white) {
-            ret_idx = WH_KING_IDX;
-            WH_KING_IDX = dest_idx;
-        } else {
-            ret_idx = BL_KING_IDX;
-            BL_KING_IDX = dest_idx;
+//     if (abs(dest_col - king_col) <= 1 && abs(dest_row - king_row) <= 1) {
+//         if (white) {
+//             ret_idx = WH_KING_IDX;
+//             WH_KING_IDX = dest_idx;
+//         } else {
+//             ret_idx = BL_KING_IDX;
+//             BL_KING_IDX = dest_idx;
+//         }
+//     }
+//     return ret_idx;
+// }
+
+static int _locate_king(Chessboard* board, bool color, int dest_idx) {
+    int src_idx = col_from_idx(dest_idx);
+    int src_row = row_from_idx(dest_idx);
+
+    for (int i = -1; i <= 1; i++) {
+        if (i < 1 || 8 < i) continue;
+        for (int j = -1; j <= 1; j++) {
+            if (j < 1 || j < i) continue;
+
+            if (i == 0 && j == 0) continue;
+
+            int new_idx = idx_from_int(src_idx + i, src_row + j);
+            uint8_t piece_found = board->squares[new_idx];
+
+            if (cmp_piece_type(piece_found, KING) 
+                && cmp_piece_color(piece_found, color)) {
+                    return new_idx;
+                }
         }
     }
-    return ret_idx;
+    return -1;
 }
 
 int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, 
@@ -380,7 +412,7 @@ int locate_piece(Chessboard* board, uint8_t piece, int dest_idx,
             ret_idx = _locate_queen(board, white, dest_idx, col, row);
             break;
         case KING:
-            ret_idx = _locate_king(white, dest_idx);
+            ret_idx = _locate_king(board, white, dest_idx);
             break;
         default:
             ret_idx = _locate_pawn(board, white, dest_idx, col, capture);
@@ -446,4 +478,43 @@ bool is_SAN(char* move) {
     regfree(&re);
 
     return status == 0;
+}
+
+bool is_check(Chessboard* board, bool white) {
+    // Find king. If not at original index, scan neighboring squares
+    int king_idx = white ? WH_KING_IDX : BL_KING_IDX;
+    uint8_t piece_at_idx = board->squares[king_idx];
+    if (!cmp_piece_type(piece_at_idx, KING)) {
+        king_idx = _locate_king(board, white, king_idx);
+        // NOTE: Architecturally, there shouldn't be an error here
+        // Should figure out a proper balance of checking for errors and
+        // assuming code works as designed.
+    }
+
+    // printf("White's Turn?: %d\n", color);
+
+    int king_col = col_from_idx(king_idx);
+
+    int ret_val;
+    if (king_col > 1) {
+        ret_val = _locate_pawn(board, !white, king_idx, king_col-1, true);
+        if (ret_val != -1) return true;
+    }
+    if (king_col < 8) {
+        ret_val = _locate_pawn(board, !white, king_idx, king_col+1, true);
+        if (ret_val != -1) return true;
+    }
+    ret_val = _locate_knight(board, !white, king_idx, 0, 0);
+    if (ret_val != -1) return true;
+    ret_val = _locate_bishop(board, !white, king_idx, 0, 0, false);
+    if (ret_val != -1) return true;
+    ret_val = _locate_rook(board, !white, king_idx, 0, 0, false);
+    if (ret_val != -1) return true;
+    ret_val = _locate_queen(board, !white, king_idx, 0, 0);
+    if (ret_val != -1) return true;
+    ret_val = _locate_king(board, !white, king_idx);
+    if (ret_val != -1) return true;
+
+    set_king(white, king_idx);
+    return false;
 }

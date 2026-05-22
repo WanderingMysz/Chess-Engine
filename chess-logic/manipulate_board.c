@@ -13,6 +13,7 @@
 
 // TODO: Move regex compilation outside function scope so it only occurs once
 static bool wh_turn = true;
+static Chessboard board_state;
 
 void update_turn() {
     wh_turn = !wh_turn;
@@ -222,7 +223,6 @@ int get_move_info(Chessboard* board, char* move_str, Move_Record* move_record) {
     // TODO: Add descriptive error codes
     move_record->src_idx = src_idx;
     if (piece_exists(board, src_idx, piece)) {
-        wh_turn = !wh_turn;
         return 0;
     }
     printf("Piece %d @ %d does not exist.\n", (int)piece, src_idx);
@@ -251,15 +251,29 @@ void clear_board(Chessboard *board) {
     }
 }
 
-void make_move(Chessboard *board, Move_Record* move) {
+int make_move(Chessboard *board, Move_Record* move) {
+    // Store relevant information to rollback move if necessary
+    memcpy(&board_state, board, sizeof(*board));
+
+    // Make the move
     set_square(board, move->src_idx, NONE);
     int color = move->color;
 
     uint8_t piece = move->piece_type;
-    if (color == WHITE) setWhite(&piece);
-    else setBlack(&piece);
+    (color == WHITE) ? setWhite(&piece) : setBlack(&piece);
     setMoved(&piece);
 
-    // printf("Setting %d to %u\n", move->dest_idx, piece);
     set_square(board, move->dest_idx, piece);
+
+    // Validate move legality
+    if (!is_check(board, color==WHITE)) {
+        update_turn();
+        return 0;
+    }
+
+    printf("Rolling back...\n");
+
+    // Rollback change if necessary
+    memcpy(board, &board_state, sizeof(board_state));
+    return 1;
 }

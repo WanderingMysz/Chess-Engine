@@ -8,8 +8,8 @@
 /* Returns if the given player's king can legally castle */
 bool can_castle(Chessboard *board, bool white, bool kingside);
 
-/* Returns if the given player is in check */
-bool is_in_check(Chessboard *board, bool white);
+/* Returns if the given player is in check. */
+bool is_check(Chessboard *board, bool white);
 
 /* Returns if the given player is checkmated */
 bool is_checkmate(Chessboard *board, bool white);
@@ -25,5 +25,7 @@ int locate_piece(Chessboard* board, uint8_t piece, int dest_idx,
                 int col, int row, bool capture);
 
 bool cmp_piece_type(uint8_t piece, PieceType comp);
+
+bool cmp_piece_color(uint8_t piece, bool color);
 
 #endif /* MOVE_VALIDATION_H */
