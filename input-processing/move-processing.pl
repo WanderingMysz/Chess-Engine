@@ -7,6 +7,7 @@ use lib $RealBin;
 
 use Word_Matching qw(match_keyword match_piece);
 use Keyword_Processing qw(process_keyword);
+use SAN_Conversion qw(convert_to_SAN);
 
 my %move_record = map { lc($_) => "" }
     qw(type_from type_to from to capture castle promotion check);
@@ -93,3 +94,6 @@ foreach my $piece (@piece_info) {
         }
     }
 }
+
+my $SAN_string = convert_to_SAN(\%move_record);
+print ("$SAN_string\n");
