@@ -294,10 +294,7 @@ static int _locate_pawn(Chessboard* board, bool white, int dest_idx,
     int dest_row = row_from_idx(dest_idx);
     int src_idx = ERR_NONE_FOUND;
 
-    printf("Pawn Destination: (%d, %d)\n", dest_col, dest_row);
-
     if (!capture) {
-        printf("Pawn Movement\n");
         // Should not be notated for standard movement
         if (col == 0) col = dest_col;
         else return ERR_NOTATION;
@@ -335,7 +332,6 @@ static int _locate_pawn(Chessboard* board, bool white, int dest_idx,
 
         return ERR_NONE_FOUND;
     } 
-    printf("Pawn Capture\n");
 
     // Column always provided for captures
     if (col < 1 || 8 < col) return ERR_NOTATION;
@@ -388,7 +384,6 @@ static int _locate_king(Chessboard* board, bool color, int dest_idx) {
 
 int locate_piece(Chessboard* board, uint8_t piece, int dest_idx, 
                  int col, int row, bool capture) {
-    printf("Locating piece...\n");
     bool white = isWhite(piece);
     uint8_t piece_type = piecetype(piece);
 
