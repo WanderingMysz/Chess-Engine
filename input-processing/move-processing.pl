@@ -6,9 +6,10 @@ use FindBin qw($RealBin);
 use lib $RealBin;
 
 use Word_Matching qw(match_keyword match_piece);
+use Keyword_Processing qw(process_keyword);
 
-my %move_record = map { lc($_) => 0 }
-                    qw(type_from type_to from to capture promotion check);
+my %move_record = map { lc($_) => "" }
+    qw(type_from type_to from to capture castle promotion check);
 
 # Takes user move string, removes punctuation except for those necessary for
 # SAN, then segments the move string into its constituent words
@@ -56,14 +57,39 @@ if ($duplicate_idx) {
     die "Ambiguity exists in one or more words. Please input move again.\n";
 }
 
+# Useful record for processing, collates information on specific pieces
 my @piece_info = ();
 while (my ($piece_idx, $piece_type) = each %found_pieces) {
     push @piece_info, { idx => $piece_idx, 
                         type => $piece_type, 
-                        role => undef, 
-                        coord => undef };
+                        role => "", 
+                        coord => "" };
 }
 
-foreach my $hash_ptr (@pieces) {
-    print "$hash_ptr->{type}\n";
+# Process all keywords, extracting move and piece information
+while (my ($keyword_idx, $keyword) = each %found_keywords) {
+    process_keyword($keyword_idx, \%found_keywords, \%found_coords, 
+                    \%found_pieces, \@piece_info, \%move_record);
+}
+
+# Process piece information to fill holes in the move record
+foreach my $piece (@piece_info) {
+    my $coord   = $piece->{coord};
+    my $role    = $piece->{role};
+
+    # If the role is explicitly known, update accordingly
+    # Otherwise, try to match using coordinates
+    if ($role eq "attack") {
+        $move_record{type_from} = $piece->{type};
+        $move_record{from} = $piece->{coord};
+    } elsif ($role eq "defend") {
+        $move_record{type_to} = $piece->{type};
+        $move_record{to} = $piece->{coord};
+    } elsif ($coord) {
+        if ($coord eq $move_record{from}) {
+            $move_record{type_from} = $piece->{type};
+        } elsif ($coord eq $move_record{to}) {
+            $move_record{type_to} = $piece->{type};
+        }
+    }
 }
