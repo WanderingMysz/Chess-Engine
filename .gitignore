@@ -1,0 +1,15 @@
+# Standard Hidden Directories
+/.venv/
+/.vscode/
+
+# MAC OS Metadata
+._*
+.DS_STORE
+
+# Project Directories
+/build/
+/data/
+
+# Miscellaneous files
+/docs/devlog.md
+/structure.txt
