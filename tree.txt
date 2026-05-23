@@ -1,0 +1,49 @@
+.
+├── build
+│   ├── bin
+│   │   └── chess
+│   └── obj
+│       ├── game.o
+│       ├── manipulate_board.o
+│       ├── move_validation.o
+│       ├── render.o
+│       ├── test_piece_info.o
+│       └── unity.o
+├── chess-bots
+│   └── BonnieBot.py
+├── chess-logic
+│   ├── game.c
+│   ├── manipulate_board.c
+│   ├── manipulate_board.h
+│   ├── move_validation.c
+│   ├── move_validation.h
+│   ├── record.h
+│   ├── render.c
+│   ├── render.h
+│   └── types.h
+├── data
+│   └── chess-games
+├── docs
+│   ├── devlog.md
+│   └── planning
+│       └── chess-logic.md
+├── Makefile
+├── makefiles
+│   └── cli.mk
+├── models
+├── README.md
+├── scripts
+├── test
+│   ├── integration
+│   ├── scripts
+│   ├── unit
+│   │   ├── test_castling.c
+│   │   └── test_piece_info.c
+│   └── vendor
+│       └── unity
+│           ├── unity_internals.h
+│           ├── unity.c
+│           └── unity.h
+└── tree.txt
+
+19 directories, 28 files

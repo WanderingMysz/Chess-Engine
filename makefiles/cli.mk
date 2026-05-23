@@ -4,8 +4,8 @@ CC 			= gcc
 CFLAGS 		= -Wall -Wextra -std=c11 -I$(INC_DIR)
 # DBG_FLAG	= -g
 
-SRC_DIR		= $(PROJECT_ROOT)/chess-logic
-INC_DIR		= $(PROJECT_ROOT)/chess-logic
+SRC_DIR		= $(PROJECT_ROOT)/chess-logic/src
+INC_DIR		= $(PROJECT_ROOT)/chess-logic/include
 OBJ_DIR		= $(PROJECT_ROOT)/build/obj
 BIN_DIR		= $(PROJECT_ROOT)/build/bin
 

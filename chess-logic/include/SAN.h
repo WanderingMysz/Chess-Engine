@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "types.h"
-#include "record.h"
+#include "move_record.h"
 
 /* ------------------------ Basic SAN Feature Parsing ----------------------- */
 
@@ -53,7 +53,7 @@ PieceType interpret_letter(char letter);
 
 /* ------------------------ Conversion to Move Record ----------------------- */
 
-// Interprets string as SAN and converts to a Move_Record
+// Interprets string as SAN and converts to a Move_Record, as much as possible
 Move_Record convert_to_record(char* SAN_string);
 
 // Updates a given Move_Record based on provided SAN string

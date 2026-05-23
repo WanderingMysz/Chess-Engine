@@ -2,7 +2,6 @@
 #define RENDER_H
 
 #include "types.h"
-#include "piece_info.h"
 #include <stdbool.h>
 
 /* Takes a board representation and outputs the Unicode representation */

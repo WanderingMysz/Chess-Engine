@@ -1,0 +1,93 @@
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/game.c:15:13: warning: unused variable 'EN_PASSANT_FLAG' [-Wunused-variable]
+   15 | static bool EN_PASSANT_FLAG = false;
+      |             ^~~~~~~~~~~~~~~
+1 warning generated.
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:139:40: warning: implicit conversion from enumeration type 'PlayerColor' to different enumeration type 'PieceColor' [-Wenum-conversion]
+  139 |         && cmp_piece_color(dest_piece, CurrentPlayer)) {
+      |            ~~~~~~~~~~~~~~~             ^~~~~~~~~~~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:157:23: warning: implicit conversion from enumeration type 'PlayerColor' to different enumeration type 'PieceColor' [-Wenum-conversion]
+  157 |     set_color(&piece, CurrentPlayer);
+      |     ~~~~~~~~~         ^~~~~~~~~~~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:105:9: warning: unused variable 'src_idx' [-Wunused-variable]
+  105 |     int src_idx = -1, dest_idx = -1;
+      |         ^~~~~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:172:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]
+  172 | }
+      | ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:184:15: warning: variable 'rank' set but not used [-Wunused-but-set-variable]
+  184 |     int file, rank = 0;
+      |               ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:208:14: warning: variable 'file' is used uninitialized whenever switch case is taken [-Wsometimes-uninitialized]
+  208 |         case 0:
+      |              ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:215:45: note: uninitialized use occurs here
+  215 |     return locate_piece(board, move_record, file, 0);
+      |                                             ^~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:201:17: warning: variable 'file' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+  201 |             if (ptr) {
+      |                 ^~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:215:45: note: uninitialized use occurs here
+  215 |     return locate_piece(board, move_record, file, 0);
+      |                                             ^~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:201:13: note: remove the 'if' if its condition is always false
+  201 |             if (ptr) {
+      |             ^~~~~~~~~~
+  202 |                 rank = rank_from_char(*ptr);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  203 |                 break;
+      |                 ~~~~~~
+  204 |             }
+      |             ~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:184:13: note: initialize the variable 'file' to silence this warning
+  184 |     int file, rank = 0;
+      |             ^
+      |              = 0
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:247:30: warning: implicit conversion from enumeration type 'PlayerColor' to different enumeration type 'PieceColor' [-Wenum-conversion]
+  247 |     PieceColor color = move->color;
+      |                ~~~~~   ~~~~~~^~~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/manipulate_board.c:255:26: warning: implicit conversion from enumeration type 'PieceColor' to different enumeration type 'PlayerColor' [-Wenum-conversion]
+  255 |     if (!is_check(board, color)) {
+      |          ~~~~~~~~        ^~~~~
+9 warnings generated.
+In file included from /Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:1:
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/include/move_validation.h:31:37: error: unknown type name 'Move_Record'
+   31 | int locate_piece(Chessboard* board, Move_Record* move_record, 
+      |                                     ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:56:52: warning: explicitly assigning value of variable of type 'int' to itself [-Wself-assign]
+   56 |             if (ret_idx == ERR_NONE_FOUND) ret_idx = ret_idx;
+      |                                            ~~~~~~~ ^ ~~~~~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:120:13: error: call to undeclared function 'check_square'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  120 |         if (check_square(board, piece, src_idx))  {
+      |             ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:257:18: error: call to undeclared function 'check_square'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  257 |             if (!check_square(board, NONE, src_idx)) return ERR_NONE_FOUND;
+      |                  ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:269:17: error: call to undeclared function 'check_square'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  269 |             if (check_square(board, piece, src_idx)) return src_idx;
+      |                 ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:286:12: error: call to undeclared function 'check_square'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  286 |     return check_square(board, piece, src_idx) ? src_idx : ERR_NONE_FOUND;
+      |            ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:314:37: warning: implicit conversion from enumeration type 'PlayerColor' to different enumeration type 'PieceColor' [-Wenum-conversion]
+  314 |     PieceColor color = move_record->color;
+      |                ~~~~~   ~~~~~~~~~~~~~^~~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:316:11: warning: unused variable 'piece' [-Wunused-variable]
+  316 |     Piece piece = piece_type & color;
+      |           ^~~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:362:6: error: conflicting types for 'can_castle'
+  362 | bool can_castle(Chessboard *board, PieceColor color, bool kingside) {
+      |      ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/include/move_validation.h:16:6: note: previous declaration is here
+   16 | bool can_castle(Chessboard *board, PlayerColor color, Direction direction);
+      |      ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:457:14: warning: implicit conversion from enumeration type 'PieceColor' to different enumeration type 'PlayerColor' [-Wenum-conversion]
+  457 |     set_king(color, king_idx);
+      |     ~~~~~~~~ ^~~~~
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/src/move_validation.c:461:6: error: conflicting types for 'is_check'
+  461 | bool is_check(Chessboard* board, PieceColor color) {
+      |      ^
+/Users/lucas/Programming/Learning/Chess/Chess-Engine/chess-logic/include/move_validation.h:19:6: note: previous declaration is here
+   19 | bool is_check(Chessboard *board, PlayerColor color);
+      |      ^
+4 warnings and 7 errors generated.
+make: *** [/Users/lucas/Programming/Learning/Chess/Chess-Engine/build/obj/move_validation.o] Error 1
