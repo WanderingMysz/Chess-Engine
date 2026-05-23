@@ -1,26 +1,26 @@
 #include <string.h>
 #include <strings.h>
 #include "render.h"
+#include "types.h"
 
-const char* unicode_pieces[2][6] = {
-    {"♚", "♛", "♜", "♝", "♞", "♟"}, // Black
-    {"♔", "♕", "♖", "♗", "♘", "♙"}  // White
+const char* UNICODE_REPRESENTATION[2][6] = {
+    {"♔", "♕", "♖", "♗", "♘", "♙"},  // White
+    {"♚", "♛", "♜", "♝", "♞", "♟"} // Black
 };
 
 void visualize_board_state(Chessboard *board, char* output, bool flip_color) {
     output[0] = '\0'; // zeroes output string
 
-    for (int row = 8; row >= 1; row--) {
-        for (int col = 1; col <= 8; col++) {
-            int sq_idx = idx_from_int(col, row);
-            int8_t piece = board->squares[sq_idx];
-            int8_t piece_type = piecetype(piece);
+    for (int rank = 8; rank >= 1; rank--) {
+        for (int file = 1; file <= 8; file++) {
+            int sq_idx = idx_from_int(file, rank);
+            Piece piece = board->squares[sq_idx];
 
-            if (piece_type) {
+            if (!cmp_piece_type(piece, NONE)) {
                 strcat(output, get_unicode(piece, flip_color));
             } else {
                 // checkerboard pattern
-                bool is_light_sq = (row + col) % 2;
+                bool is_light_sq = (rank + file) % 2;
                 strcat(output, is_light_sq ? "□" : "▪");
             }
 
@@ -35,5 +35,5 @@ const char* get_unicode(PieceType piece, bool flip_color) {
     int color_idx = piece & COLOR_MASK ? 0 : 1;
 
     if (flip_color) color_idx = !color_idx;
-    return unicode_pieces[color_idx][type_idx];
+    return UNICODE_REPRESENTATION[color_idx][type_idx];
 }

@@ -1,9 +1,9 @@
 #include "manipulate_board.h"
 #include "move_validation.h"
-#include "record.h"
+#include "move_record.h"
+#include "move_record_ops.h"
 #include "types.h"
-#include "piece_info.h"
-#include "errors.h"
+
 #include <stdio.h>
 #include <regex.h>
 #include <string.h>
@@ -12,27 +12,19 @@
 #include <stdlib.h>
 
 // TODO: Move regex compilation outside function scope so it only occurs once
-static bool wh_turn = true;
-static Chessboard board_state;
 
-void update_turn() {
-    wh_turn = !wh_turn;
-}
+static PlayerColor CurrentPlayer = WHITE;
+static Chessboard SaveState;
 
-void set_square(Chessboard* board, int idx, uint8_t piece) {
+void update_turn() { CurrentPlayer = (CurrentPlayer == WHITE) ? BLACK : WHITE; }
+
+inline void set_square(Chessboard* board, int idx, Piece piece) {
     board->squares[idx] = piece;
 }
 
-// /* Sets the color of a given square's piece */
-// static void set_piece_color(uint8_t* piece, uint8_t color) {
-//     *piece &= ~(COLOR_MASK);
-//     *piece |= color;
-// }
-
-static void _set_pawns(Chessboard *board, int row) {
-    for (int col = 1; col <= 8; col++) {
-        uint8_t piece_type = PAWN;
-        set_square(board, idx_from_int(col, row), piece_type);
+static void _set_pawns(Chessboard *board, int rank) {
+    for (int file = 1; file <= 8; file++) {
+        set_square(board, idx_from_int(file, rank), PAWN);
     }
 }
 
@@ -41,33 +33,33 @@ static void set_pawns(Chessboard *board) {
     _set_pawns(board, 7);
 }
 
-static void _set_pieces(Chessboard *board, int row) {
-    for (int col = 1; col <= 8; col++) {
-        uint8_t piece_type;
-        switch (col) {
+static void _set_pieces(Chessboard *board, int rank) {
+    for (int file = 1; file <= 8; file++) {
+        PieceType type;
+        switch (file) {
             case 1:
             case 8:
-                piece_type = ROOK;
+                type = ROOK;
                 break;
             case 2:
             case 7:
-                piece_type = KNIGHT;
+                type = KNIGHT;
                 break;
             case 3:
             case 6:
-                piece_type = BISHOP;
+                type = BISHOP;
                 break;
             case 4:
-                piece_type = QUEEN;
+                type = QUEEN;
                 break;
             case 5:
-                piece_type = KING;
+                type = KING;
                 break;
             default:
-                piece_type = NONE;
+                type = NONE;
                 break;
         }
-        set_square(board, idx_from_int(col, row), piece_type);
+        set_square(board, idx_from_int(file, rank), type);
     }
 }
 
@@ -77,18 +69,18 @@ static void set_pieces(Chessboard *board) {
 }
 
 static void set_colors(Chessboard *board) {
-    for (int row = 1; row <= 8; row++) {
-        uint8_t color = (row <= 4) ? WHITE : BLACK;
+    for (int rank = 1; rank <= 8; rank++) {
+        PlayerColor color = (rank <= 4) ? WHITE : BLACK;
 
-        for (int col = 1; col <= 8; col++) {
-            int idx = idx_from_int(col, row);
-            (color == WHITE)? setWhite(&(board->squares[idx])) 
-                            : setBlack(&(board->squares[idx]));
+        for (int file = 1; file <= 8; file++) {
+            int idx = idx_from_int(file, rank);
+            set_color(&(board->squares[idx]), color);
         }
     }
 }
 
-static uint8_t _get_piece_type(char letter) {
+// NOTE: May have case '' = PAWN and default = NONE
+static PieceType type_from_letter(char letter) {
     switch (letter) {
         case 'N':
             return KNIGHT;
@@ -105,9 +97,9 @@ static uint8_t _get_piece_type(char letter) {
     }
 }
 
-int get_move_info(Chessboard* board, char* SAN_input, Move_Record* move_record) {
-    int src_idx = -1, dest_idx = -1;
-    uint8_t piece;
+static int process_SAN(Chessboard* board, char* SAN_input,
+                       Move_Record* move_record, char* src_coord) {
+    int dest_idx = -1;
     bool capture = false;
 
     int left_idx = 0;
@@ -116,9 +108,9 @@ int get_move_info(Chessboard* board, char* SAN_input, Move_Record* move_record) 
     // last two values excluding promotions and checks is always destination
 
     // Checks for Promotion
-    char* ptr = strchr("NBRQ", SAN_input[right_idx]);
-    if (ptr) {
-        move_record->promotion = _get_piece_type(*ptr);
+    char* promotion_ptr = strchr("NBRQ", SAN_input[right_idx]);
+    if (promotion_ptr) {
+        move_record->promotion = type_from_letter(*promotion_ptr);
         right_idx -= 2;
     }
 
@@ -138,8 +130,10 @@ int get_move_info(Chessboard* board, char* SAN_input, Move_Record* move_record) 
     dest_idx = idx_from_char(SAN_input[right_idx-1],SAN_input[right_idx]);
 
     // Cannot capture yourself
-    uint8_t dest_piece = board->squares[dest_idx];
-    if (!cmp_piece_type(dest_piece, NONE) && (isWhite(dest_piece) == wh_turn)) {
+    Piece dest_piece = board->squares[dest_idx];
+    if (!cmp_piece_type(dest_piece, NONE) 
+        && cmp_piece_color(dest_piece, CurrentPlayer)) {
+
         printf("Cannot capture your own piece.\n");
         return 1;
     }
@@ -153,80 +147,71 @@ int get_move_info(Chessboard* board, char* SAN_input, Move_Record* move_record) 
     }
     move_record->capture = capture;
 
-    // pieces default to white
-    piece = _get_piece_type(SAN_input[0]);
+    Piece piece;
 
-    if (!wh_turn) {
-        setBlack(&piece);
-        move_record->color = BLACK;
-    } else {
-        move_record->color = WHITE;
-    }
+    set_color(&piece, CurrentPlayer);
+    move_record->color = CurrentPlayer;
 
-    move_record->piece_type = piece;
+    PieceType piece_type = type_from_letter(SAN_input[0]);
+    set_piece(&piece, piece_type);
+    move_record->piece_type = piece_type;
 
-    /* NOTE: Piece's color could be set after the comparison, but this is
-       structured per the natural logic */
-       
     // Extracts information from bracketed area: N [g6] xe5 
-    char src_info[3] = {'\0', '\0', '\0'};
     if (!cmp_piece_type(piece, PAWN)) left_idx++;
     for (int i = 0; left_idx <= right_idx; i++) {
         if (2 <= i) {
             printf("Too many values for source idx. Aborting.\n");
-            return 1; // TODO: Make dict to enumerate error codes
+            return ERR_NOTATION;
         }
-        src_info[i] = SAN_input[left_idx];
+        src_coord[i] = SAN_input[left_idx];
         left_idx++;
     }
 
+    return 0;
+}
+
+int generate_record(Chessboard* board, char* SAN_input, 
+                    Move_Record* move_record) {
+
+    /* NOTE: Piece's color could be set after the comparison, but this is
+       structured per the natural logic */
+       
+    char src_coord[3] = {'\0', '\0', '\0'};
+    if (process_SAN(board, SAN_input, move_record, src_coord) != 0) return 1;
+
     // If the entire source information is provided, validate then return
-    switch (strlen(src_info)) {
+    int file = 0, rank = 0;
+    switch (strlen(src_coord)) {
         case 2:
-            src_idx = locate_piece(board, piece, dest_idx, 
-                                    src_info[0], src_info[1], capture);
+            file = file_from_char(src_coord[0]);
+            rank = rank_from_char(src_coord[1]);
             break;
         case 1:
             ;
             char* ptr;
 
-            ptr = strchr("abcdefgh", src_info[0]);
+            ptr = strchr("abcdefgh", src_coord[0]);
             if (ptr) {
-                int col = *ptr - 'a' + 1;
-                src_idx = locate_piece(board, piece, dest_idx, col, 0, capture);
+                file = file_from_char(*ptr);
                 break;
             }
             
-            ptr = strchr("12345678", src_info[0]);
+            ptr = strchr("12345678", src_coord[0]);
             if (ptr) {
-                int row = *ptr - '0';
-                src_idx = locate_piece(board, piece, dest_idx, 0, row, capture);
+                rank = rank_from_char(*ptr);
                 break;
             }
 
             return 1;
 
         case 0:
-            src_idx = locate_piece(board, piece, dest_idx, 0, 0, capture);
             break;
         
         default:
             return 1;
     }
 
-    // Error codes all negative
-    if (src_idx < 0) {
-        printf("ERROR: %d\n", src_idx);
-        return 1;
-    }
-
-    // TODO: Add descriptive error codes
-    move_record->src_idx = src_idx;
-    if (piece_exists(board, src_idx, piece)) {
-        return 0;
-    }
-    printf("Piece %d @ %d does not exist.\n", (int)piece, src_idx);
-    return 1;
+    return locate_piece(board, move_record, file, rank);
 }
 
 Chessboard initialize_chessboard() {
@@ -253,27 +238,26 @@ void clear_board(Chessboard *board) {
 
 int make_move(Chessboard *board, Move_Record* move) {
     // Store relevant information to rollback move if necessary
-    memcpy(&board_state, board, sizeof(*board));
+    memcpy(&SaveState, board, sizeof(*board));
 
     // Make the move
     set_square(board, move->src_idx, NONE);
-    int color = move->color;
 
-    uint8_t piece = move->piece_type;
-    (color == WHITE) ? setWhite(&piece) : setBlack(&piece);
-    setMoved(&piece);
+    PlayerColor color = move->color;
+    Piece piece = move->piece_type;
+    set_color(&piece, color);
 
+    set_moved(&piece);
     set_square(board, move->dest_idx, piece);
 
     // Validate move legality
-    if (!is_check(board, color==WHITE)) {
+    if (!is_check(board, color)) {
         update_turn();
         return 0;
     }
 
-    printf("Rolling back...\n");
-
     // Rollback change if necessary
-    memcpy(board, &board_state, sizeof(board_state));
+    printf("Rolling back...\n");
+    memcpy(board, &SaveState, sizeof(SaveState));
     return 1;
 }
