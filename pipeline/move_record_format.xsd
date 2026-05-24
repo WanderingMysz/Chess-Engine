@@ -7,8 +7,8 @@
             <xs:element name="turn_number"  type="xs:unsignedShort"/>
             <xs:element name="color"        type="PlayerColor"/>
             <xs:element name="piece"        type="ChessPiece"/>
-            <xs:element name="source"       type="Index"/>
-            <xs:element name="destination"  type="Index"/>
+            <xs:element name="source"       type="Coordinate"/>
+            <xs:element name="destination"  type="Coordinate"/>
             <xs:element name="capture"      type="xs:boolean"/>
             <xs:element name="check"        type="xs:boolean"/>
             <xs:element name="checkmate"    type="xs:boolean"/>
@@ -19,7 +19,7 @@
 
 <!-- ======================= Coordinate Definitions ======================== -->
     
-    <!-- <xs:simpleType name="FileChar">
+    <xs:simpleType name="FileChar">
         <xs:restriction base="xs:string">
             <xs:length value="1"/>
             <xs:pattern value="[a-h]"/>
@@ -38,14 +38,14 @@
             <xs:element name="file" type="FileChar"/>
             <xs:element name="rank" type="RankChar"/>
         </xs:sequence>
-    </xs:complexType> -->
+    </xs:complexType>
 
-    <xs:simpleType name="Index">
+    <!-- <xs:simpleType name="Index">
         <xs:restriction base="xs:integer">
             <xs:minInclusive value="0"/>
             <xs:maxInclusive value="63"/>
         </xs:restriction>
-    </xs:simpleType>
+    </xs:simpleType> -->
 
 <!-- ========================== Type Definitions =========================== -->
 
