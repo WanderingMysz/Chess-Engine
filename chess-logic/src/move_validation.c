@@ -418,6 +418,7 @@ bool is_SAN(char* user_input) {
     return status == 0;
 }
 
+// Helper function to allow for additional squares (such as during castling)
 bool _is_check(Chessboard* board, PlayerColor color, int king_idx) {
     Piece piece = KING;
     set_color(&piece, color);
@@ -427,7 +428,6 @@ bool _is_check(Chessboard* board, PlayerColor color, int king_idx) {
     // Find king. If not at original index, scan neighboring squares
     if (king_idx == -1) {
         king_idx = (color == WHITE) ? WH_KING_IDX : BL_KING_IDX; 
-
         if (!cmp_with_idx(board, piece, king_idx)) {
             king_idx = _locate_king(board, color, king_idx);
         }
@@ -460,6 +460,5 @@ bool _is_check(Chessboard* board, PlayerColor color, int king_idx) {
 }
 
 bool is_check(Chessboard* board, PlayerColor color) {
-    int king_idx = (color == WHITE) ? WH_KING_IDX : BL_KING_IDX;
-    return _is_check(board, color, king_idx);
+    return _is_check(board, color, -1);
 }
