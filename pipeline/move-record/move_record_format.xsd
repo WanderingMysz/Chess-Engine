@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="move" type="MoveRecord"/>
+
+    <xs:complexType name="MoveRecord">
+        <xs:sequence>
+            <xs:element name="piece"            type="ChessPiece"/>
+            <xs:element name="source"           type="Coordinate"/>
+            <xs:element name="destination"      type="Coordinate"/>
+            <xs:element name="capture"          type="Flag"/>
+            <xs:element name="check"            type="Flag"/>
+            <xs:element name="checkmate"        type="Flag"/>
+            <xs:element name="castling"         type="Flag"/>
+            <xs:element name="secondary"        type="ChessPiece"/>
+        </xs:sequence>
+    </xs:complexType>
+
+<!-- ======================= Coordinate Definitions ======================== -->
+    
+    <xs:simpleType name="FileChar">
+        <xs:restriction base="xs:string">
+            <xs:length value="1"/>
+            <xs:pattern value="[a-h]"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RankChar">
+        <xs:restriction base="xs:string">
+            <xs:length value="1"/>
+            <xs:pattern value="[1-8]"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="Coordinate">
+        <xs:sequence>
+            <xs:element name="file" type="FileChar"/>
+            <xs:element name="rank" type="RankChar"/>
+        </xs:sequence>
+    </xs:complexType>
+
+<!-- ========================== Type Definitions =========================== -->
+
+    <xs:simpleType name="ChessPiece">
+        <xs:restriction base="xs:string">
+            <xs:length value="6"/>
+            <xs:enumeration value="NONE  "/>
+            <xs:enumeration value="PAWN  "/>
+            <xs:enumeration value="KNIGHT"/>
+            <xs:enumeration value="BISHOP"/>
+            <xs:enumeration value="ROOK  "/>
+            <xs:enumeration value="QUEEN "/>
+            <xs:enumeration value="KING  "/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Flag">
+        <xs:restriction base="xs:string">
+            <xs:length value="1"/>
+            <xs:enumeration value="Y"/>
+            <xs:enumeration value="N"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
