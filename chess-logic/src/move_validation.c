@@ -360,46 +360,6 @@ int locate_piece(Chessboard* board, Move_Record* move_record,
     return src_idx;
 }
 
-bool can_castle(Chessboard *board, PlayerColor color, Direction direction) {
-    int king_file = 5;
-    int rank = (color == WHITE) ? 1 : 8;
-
-    int king_idx = idx_from_int(king_file, rank);
-    Piece king_piece = board->squares[king_idx];
-
-    // If the piece is not a king or has moved, return false
-    if (!cmp_piece_type(king_piece, KING) 
-        || !cmp_piece_color(king_piece, color)
-        || has_moved(king_piece)) {
-        return false;
-    }
-
-    int rook_file = (direction == KINGSIDE) ? 8 : 1;
-    int rook_idx = idx_from_int(rook_file, rank);
-    Piece rook_piece = board->squares[rook_idx];
-
-    // If the piece is not a rook or has moved, return false
-    if (!cmp_piece_type(rook_piece, ROOK) 
-        || !cmp_piece_color(rook_piece, color)
-        || has_moved(rook_piece)) {
-        return false;
-    }
-
-    // If there are intervening pieces, return false
-    for (int file = (direction == KINGSIDE) ? --rook_file : ++rook_file; 
-        file != king_file; 
-        (direction == KINGSIDE) ? --file : ++file
-    ) {
-        int intervening_idx = idx_from_int(file, rank);
-        Piece intervening_piece = board->squares[intervening_idx];
-        if (!cmp_piece_type(intervening_piece, NONE)) return false;
-    }
-
-    // FIXME cannot castle into danger
-
-    return true;
-}
-
 bool is_SAN(char* user_input) {
     // TODO Correct such that promotion only works with pawns
     const char* pattern = ( "^(O-O(-O)?|0-0(-0)?|" // Castling
@@ -462,3 +422,59 @@ bool _is_check(Chessboard* board, PlayerColor color, int king_idx) {
 bool is_check(Chessboard* board, PlayerColor color) {
     return _is_check(board, color, -1);
 }
+
+bool can_castle(Chessboard *board, PlayerColor color, Direction direction) {
+    int king_file = 5;
+    int rank = (color == WHITE) ? 1 : 8;
+
+    int king_idx = idx_from_int(king_file, rank);
+    Piece king_piece = board->squares[king_idx];
+
+    // If the piece is not a king or has moved, return false
+    if (!cmp_piece_type(king_piece, KING) 
+        || !cmp_piece_color(king_piece, color)
+        || has_moved(king_piece)) {
+        return false;
+    }
+
+    int rook_file = (direction == KINGSIDE) ? 8 : 1;
+    int rook_idx = idx_from_int(rook_file, rank);
+    Piece rook_piece = board->squares[rook_idx];
+
+    // If the piece is not a rook or has moved, return false
+    if (!cmp_piece_type(rook_piece, ROOK) 
+        || !cmp_piece_color(rook_piece, color)
+        || has_moved(rook_piece)) {
+        return false;
+    }
+
+    // If there are intervening pieces, return false
+    for (int file = (direction == KINGSIDE) ? --rook_file : ++rook_file; 
+        file != king_file; 
+        (direction == KINGSIDE) ? --file : ++file
+    ) {
+        int intervening_idx = idx_from_int(file, rank);
+        Piece intervening_piece = board->squares[intervening_idx];
+        if (!cmp_piece_type(intervening_piece, NONE)) return false;
+    }
+
+    // Cannot castle into check
+    int idx;
+    if (direction == QUEENSIDE) {
+        idx = idx_from_int(king_file-1, rank);
+        if (_is_check(board, color, idx)) return false;
+
+        idx = idx_from_int(king_file-2, rank);
+        if (_is_check(board, color, idx)) return false;
+    }
+    else {
+        idx = idx_from_int(king_file+1, rank);
+        if (_is_check(board, color, idx)) return false;
+
+        idx = idx_from_int(king_file+2, rank);
+        if (_is_check(board, color, idx)) return false;
+    }
+
+    return true;
+}
+
