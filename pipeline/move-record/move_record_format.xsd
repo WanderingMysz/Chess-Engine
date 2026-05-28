@@ -4,15 +4,15 @@
 
     <xs:complexType name="MoveRecord">
         <xs:sequence>
-            <xs:element name="primary"          type="ChessPiece"/>
-            <xs:element name="secondary"        type="ChessPiece"/>
-            <xs:element name="source-square"    type="Coordinate"/>
-            <xs:element name="dest-square"      type="Coordinate"/>
-            <xs:element name="capture"          type="Flag"/>
-            <xs:element name="check"            type="Flag"/>
-            <xs:element name="checkmate"        type="Flag"/>
-            <xs:element name="promotion"        type="Flag"/>
-            <xs:element name="castling"         type="Flag"/>
+            <xs:element name="piece"            type="ChessPiece"/>
+            <xs:element name="opt_info"         type="ChessPiece"/>
+            <xs:element name="src_square"       type="Coordinate"/>
+            <xs:element name="dest_square"      type="Coordinate"/>
+            <xs:element name="capture_flag"     type="Flag"/>
+            <xs:element name="check_flag"       type="Flag"/>
+            <xs:element name="checkmate_flag"   type="Flag"/>
+            <xs:element name="promotion_flag"   type="Flag"/>
+            <xs:element name="castling_flag"    type="Flag"/>
         </xs:sequence>
     </xs:complexType>
 

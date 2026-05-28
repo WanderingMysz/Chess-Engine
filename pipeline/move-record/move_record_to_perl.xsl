@@ -28,7 +28,7 @@
     <xsl:template name="perl-header">
         <xsl:text># </xsl:text>
         <xsl:call-template name="warning-header"/>
-        <xsl:text>package Move_Record;&#10;&#10;</xsl:text>
+        <xsl:text>package move_record;&#10;&#10;</xsl:text>
         <xsl:text>use Exporter qw(import);&#10;</xsl:text>
         <xsl:text>our @EXPORT_OK = qw(%move_record);&#10;&#10;</xsl:text>
     </xsl:template>

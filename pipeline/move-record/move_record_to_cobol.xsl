@@ -52,13 +52,8 @@
         <xsl:value-of select="$level * 5"/>
         <xsl:text> </xsl:text>
         <xsl:value-of select="translate(@name, 
-                                       'abcdefghijklmnopqrstuvwxyz', 
-                                       'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
-
-        <!-- Flags should be explicitly named for interpretability -->
-        <xsl:if test="@type = 'Flag'">
-            <xsl:text>-FLAG</xsl:text>
-        </xsl:if>
+                                       'abcdefghijklmnopqrstuvwxyz_', 
+                                       'ABCDEFGHIJKLMNOPQRSTUVWXYZ-')"/>
 
         <!-- Record fields -->
         <xsl:variable name="fieldName" select="@type"/>
