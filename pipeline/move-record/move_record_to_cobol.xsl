@@ -3,9 +3,6 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <!-- <xsl:key name="simpleType"  match="xs:simpleType"   use="@name"/>
-    <xsl:key name="complexType" match="xs:complexType"  use="@name"/> -->
-
 <!-- ========================= Define Indentations ========================= -->
     <xsl:variable name="root-indent"    select="'       '"/>
     <xsl:variable name="std-indent"     select="'    '"/>
@@ -28,18 +25,16 @@
 
     </xsl:template>
 
-    <!-- Match complexType s within the tree -->
+    <!-- Recursively breakdown complexType -->
     <xsl:template match="xs:complexType">
         <xsl:param name="level"/>
 
-        <!-- Process the elements within, increasing the level recursively -->
         <xsl:apply-templates select="xs:sequence/xs:element">
             <xsl:with-param name="level" select="$level"/>
         </xsl:apply-templates>
     </xsl:template>
 
-    <!-- TODO: Increase indentation based on level -->
-    <!-- Don't need to prefix xs:sequence/ as ALL elements are prefixed -->
+<!-- ======================= Basic Element Matching ======================== -->
     <xsl:template match="xs:element">
         <xsl:param name="level"/>
 
@@ -47,7 +42,7 @@
             <xsl:with-param name="level" select="$level"/>
         </xsl:call-template>
 
-        <!-- If $level < 10, add leading 0 -->
+        <!-- If $level < 2, add leading 0 -->
         <xsl:if test="$level &lt; 2">
             <xsl:text>0</xsl:text>
         </xsl:if>
@@ -86,6 +81,7 @@
             <xsl:when test="$complexType">
                 <xsl:text>.&#10;</xsl:text>
                 <xsl:apply-templates select="$complexType">
+                    <!-- Increase recursion level -->
                     <xsl:with-param name="level" select="$level + 1"/>
                 </xsl:apply-templates>
             </xsl:when>
@@ -93,6 +89,8 @@
         </xsl:choose>
 
     </xsl:template>
+
+<!-- ======================== Indentation by Level ========================= -->
 
     <xsl:template name="apply-indentation">
         <xsl:param name="level"/>
