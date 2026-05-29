@@ -5,12 +5,14 @@ use strict;
 use FindBin qw($RealBin);
 use lib $RealBin;
 
-use Word_Matching qw(match_keyword match_piece);
-use Keyword_Processing qw(process_keyword);
-use SAN_Conversion qw(convert_to_SAN);
+use word_matching qw(match_keyword match_piece);
+use keyword_processing qw(process_keyword);
+use san_conversion qw(convert_to_SAN);
 
-my %move_record = map { lc($_) => "" }
-    qw(type_from type_to from to capture castle promotion check);
+use move_record qw(%move_record);
+
+# my %move_record = map { lc($_) => "" }
+#     qw(piece type_to src_square to capture castle promotion check);
 
 # Takes user move string, removes punctuation except for those necessary for
 # SAN, then segments the move string into its constituent words
@@ -81,16 +83,16 @@ foreach my $piece (@piece_info) {
     # If the role is explicitly known, update accordingly
     # Otherwise, try to match using coordinates
     if ($role eq "attack") {
-        $move_record{type_from} = $piece->{type};
-        $move_record{from} = $piece->{coord};
+        $move_record{piece_attack} = $piece->{type};
+        $move_record{src_square} = $piece->{coord};
     } elsif ($role eq "defend") {
-        $move_record{type_to} = $piece->{type};
-        $move_record{to} = $piece->{coord};
+        $move_record{piece_defend} = $piece->{type};
+        $move_record{dest_square} = $piece->{coord};
     } elsif ($coord) {
-        if ($coord eq $move_record{from}) {
-            $move_record{type_from} = $piece->{type};
-        } elsif ($coord eq $move_record{to}) {
-            $move_record{type_to} = $piece->{type};
+        if ($coord eq $move_record{src_square}) {
+            $move_record{piece_attack} = $piece->{type};
+        } elsif ($coord eq $move_record{dest_square}) {
+            $move_record{piece_defend} = $piece->{type};
         }
     }
 }

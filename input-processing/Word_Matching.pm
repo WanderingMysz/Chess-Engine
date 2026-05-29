@@ -1,4 +1,4 @@
-package Word_Matching;
+package word_matching;
 
 use warnings;
 use strict;

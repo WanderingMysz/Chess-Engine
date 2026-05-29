@@ -1,4 +1,4 @@
-package Keyword_Processing;
+package keyword_processing;
 
 use warnings;
 use strict;
@@ -8,7 +8,7 @@ no warnings 'experimental::smartmatch';
 use Exporter qw(import);
 our @EXPORT_OK = qw(process_keyword);
 
-use Word_Matching qw(@queenside_terms @kingside_terms);
+use word_matching qw(@queenside_terms @kingside_terms);
 
 our ($idx, $keywords, $coords, $pieces, $piece_info, $move_record);
 my @TO_EXCEPTIONS = qw(PROMOTES CASTLES);
@@ -59,12 +59,12 @@ sub _to {
     my $ret = 0;
     if (defined $piece) {
         $ret |= _update_piece_info($idx-1, "role", "attack");
-        $ret |= _update_move_record("type_from", $piece);
+        $ret |= _update_move_record("piece_attack", $piece);
     } elsif (defined $coord_from) {
-        $ret |= _update_move_record("from", $coord_from);
+        $ret |= _update_move_record("src_square", $coord_from);
     } else { return 1; }
 
-    $ret |= _update_move_record("to", $coord_to);
+    $ret |= _update_move_record("dest_square", $coord_to);
     return $ret;
 }
 # piece FROM coord
@@ -74,8 +74,8 @@ sub _from {
 
     my $ret = 0;
     $ret |= _update_piece_info($idx-1, "role", "attack");
-    $ret |= _update_move_record("type_from", $piece);
-    $ret |= _update_move_record("from", $coord_from);
+    $ret |= _update_move_record("piece_attack", $piece);
+    $ret |= _update_move_record("src_square", $coord_from);
     return $ret;
 }
 # piece / coord CAPTURE piece / coord
@@ -88,19 +88,19 @@ sub _capture {
     my $ret = 0;
     if (defined $piece_from) {
         $ret |= _update_piece_info($idx-1, "role", "attack");
-        $ret |= _update_move_record("type_from", $piece_from);
+        $ret |= _update_move_record("piece_attack", $piece_from);
     } elsif (defined $coord_from) {
-        $ret |= _update_move_record("from", $coord_from);
+        $ret |= _update_move_record("src_square", $coord_from);
     } else { return 1; }
 
     if (defined $piece_to) {
         $ret |= _update_piece_info($idx+1, "role", "defend");
-        $ret |= _update_move_record("type_to", $piece_to);
+        $ret |= _update_move_record("piece_defend", $piece_to);
     } elsif (defined $coord_to) {
-        $ret |= _update_move_record("to", $coord_to);
+        $ret |= _update_move_record("dest_square", $coord_to);
     } else { return 1; }
 
-    $ret |= _update_move_record("capture", "y");
+    $ret |= _update_move_record("capture_flag", "y");
 
     return $ret;
 }
@@ -112,16 +112,18 @@ sub _promote {
 
     my $ret = 0;
     # $ret |= _update_move_record("from", $coord) if (defined $coord);
-    $ret |= _update_move_record("promotion", $piece);
+    $ret |= _update_move_record("promotion_flag", "y");
+    $ret |= _update_move_record("opt_info", $piece);
     return $ret;
 }
 # CHECK
 sub _check {
-    _update_move_record("check", "check");
+    _update_move_record("check_flag", "y");
 }
 # MATE
 sub _mate {
-    _update_move_record("check", "checkmate");
+    _update_move_record("check_flag", "y");
+    _update_move_record("checkmate_flag", "y");
 }
 # CASTLE {KINGSIDE / QUEENSIDE}
 sub _castle {
@@ -131,10 +133,12 @@ sub _castle {
 
     if (!defined $direction) { return 1 };
     if (grep {$direction eq $_} @queenside_terms) {
-        _update_move_record("castle", "queenside");
+        _update_move_record("castling_flag", "y");
+        _update_move_record("opt_info", "QUEEN");
         return 0;
     } elsif (grep {$direction eq $_} @kingside_terms) {
-        _update_move_record("castle", "kingside");
+        _update_move_record("castling_flag", "y");
+        _update_move_record("opt_info", "KING");
         return 0;
     }
     return 1;
