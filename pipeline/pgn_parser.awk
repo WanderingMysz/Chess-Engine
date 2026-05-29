@@ -27,7 +27,7 @@ BEGIN {
                 if (block_field) break;
 
                 # If it matches a move number, e.g. "1.a4"
-                if ($i ~ /^[0-9]+(\.)[^.][a-zA-z0-9]*/) {
+                if ($i ~ /^[0-9]+(\.)[^.][a-zA-Z0-9]*/) {
                     if (!enumerate) sub(/^[0-9]+(\.)+/, "", $i); 
                     printf "%s", $i;
                 }
