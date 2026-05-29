@@ -35,8 +35,8 @@
 
     <xs:complexType name="Coordinate">
         <xs:sequence>
-            <xs:element name="file-id" type="FileChar"/>
-            <xs:element name="rank-id" type="RankChar"/>
+            <xs:element name="file_id" type="FileChar"/>
+            <xs:element name="rank_id" type="RankChar"/>
         </xs:sequence>
     </xs:complexType>
 
