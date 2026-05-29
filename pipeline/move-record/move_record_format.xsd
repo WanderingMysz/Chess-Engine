@@ -4,7 +4,8 @@
 
     <xs:complexType name="MoveRecord">
         <xs:sequence>
-            <xs:element name="piece"            type="ChessPiece"/>
+            <xs:element name="piece_attack"     type="ChessPiece"/>
+            <xs:element name="piece_defend"     type="ChessPiece"/>
             <xs:element name="opt_info"         type="ChessPiece"/>
             <xs:element name="src_square"       type="Coordinate"/>
             <xs:element name="dest_square"      type="Coordinate"/>
